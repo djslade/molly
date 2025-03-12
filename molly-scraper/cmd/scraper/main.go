@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/url"
 
-	"github.com/djslade/molly/molly-scraper/internal/scraper"
 	"github.com/djslade/molly/molly-scraper/internal/selectors"
 )
 
@@ -46,14 +45,12 @@ func main() {
 
 		fmt.Println("Ready to scrape!")
 
-		recipeHTML, err := scraper.GetDocument(recipeURL)
+		recipe, err := cfg.scrapeRecipe(recipeURL, host)
 		if err != nil {
 			fmt.Println(err)
 			continue
 		}
 
-		// Get recipe title
-		recipeTitle := scraper.FindSelectionFromDocument(recipeHTML, cfg.selectorsMap[host].Title)
-		fmt.Println(recipeTitle)
+		fmt.Printf("%+v", recipe)
 	}
 }
