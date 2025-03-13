@@ -51,6 +51,19 @@ func main() {
 			continue
 		}
 
-		fmt.Printf("%+v", recipe)
+		fmt.Printf("%v", recipe.Title)
+		for _, ingredient := range recipe.Ingredients {
+			fmt.Println(ingredient.FullText)
+			fmt.Println(ingredient.IsOptional)
+			fmt.Println(ingredient.Quantity)
+			fmt.Println(ingredient.Unit)
+			fmt.Println(ingredient.Name)
+		}
+
+		for _, step := range recipe.Steps {
+			fmt.Println(step.Index)
+			fmt.Println(step.Text)
+			fmt.Println(step.HasTimer)
+		}
 	}
 }
