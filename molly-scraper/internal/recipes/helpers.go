@@ -1,7 +1,6 @@
 package recipes
 
 import (
-	"fmt"
 	"regexp"
 	"strconv"
 	"strings"
@@ -58,8 +57,7 @@ func ParseUnit(text string) string {
 	case "litre", "litres", "liter", "liters", "l", "ls":
 		return "litre"
 	default:
-		fmt.Println("Cannot parse unit: ", text)
-		return ""
+		return text
 	}
 }
 
@@ -67,22 +65,8 @@ func ParseIsOptional(text string) bool {
 	return strings.Contains(strings.ToLower(text), "optional")
 }
 
-func ParseTimer(text string) Timer {
+func ParseTimerRequired(text string) bool {
 	timerRX := regexp.MustCompile(`(\d+).+(minute|second|hour)`)
 	matches := timerRX.FindStringSubmatch(text)
-	if len(matches) < 3 {
-		return Timer{}
-	}
-
-	value, _ := strconv.Atoi(matches[len(matches)-2])
-	unit := matches[len(matches)-1]
-
-	if value == 0 || unit == "" {
-		return Timer{}
-	}
-
-	return Timer{
-		Value: value,
-		Unit:  unit,
-	}
+	return len(matches) >= 3
 }

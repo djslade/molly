@@ -8,30 +8,14 @@ type Ingredient struct {
 	IsOptional bool    `json:"is_optional"`
 }
 
-type Timer struct {
-	Value int    `json:"value"`
-	Unit  string `json:"unit"`
-}
-
-type Substep struct {
-	Index int    `json:"index"`
-	Text  string `json:"text"`
-	Timer Timer  `json:"timer"`
-}
-
 type Step struct {
-	Index    int       `json:"index"`
-	Text     string    `json:"text"`
-	Substeps []Substep `json:"substep"`
+	Index    int    `json:"index"`
+	Text     string `json:"text"`
+	HasTimer bool   `json:"has_timer"`
 }
 
 type Recipe struct {
 	Title       string       `json:"title"`
-	Servings    string       `json:"servings"`
-	CookingTime string       `json:"cooking_time"`
-	NoSubsteps  bool         `json:"no_substeps"`
 	Ingredients []Ingredient `json:"ingredients"`
 	Steps       []Step       `json:"steps"`
 }
-
-// `input.wprm-recipe-servings.wprm-recipe-servings-91591`

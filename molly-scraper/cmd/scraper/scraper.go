@@ -22,8 +22,6 @@ func (cfg *config) scrapeRecipe(rawURL string, host string) (recipes.Recipe, err
 		tags   selectors.Selectors = cfg.selectorsMap[host]
 	)
 
-	recipe.NoSubsteps = selectors.SetNoSubsteps(host)
-
 	c.OnHTML(tags.Title, func(e *colly.HTMLElement) {
 		recipe.Title = e.Text
 	})
@@ -59,28 +57,18 @@ func (cfg *config) scrapeRecipe(rawURL string, host string) (recipes.Recipe, err
 	})
 
 	c.OnHTML(tags.Steps, func(e *colly.HTMLElement) {
-		var step recipes.Step
-		step.Index = len(recipe.Steps)
-
-		cleanedText := cleaners.Clean(e.Text)
-		step.Text = cleaners.Clean(cleanedText)
-
-		if !recipe.NoSubsteps {
-			sentences := strings.Split(cleanedText, ". ")
-			for i, sentence := range sentences {
-				var substep recipes.Substep
-				substep.Index = i
-				substep.Text = cleaners.RemoveFullStops(sentence)
-				substep.Timer = recipes.ParseTimer(substep.Text)
-				step.Substeps = append(step.Substeps, substep)
-			}
+		split := strings.Split(e.Text, "\n")
+		for i, st := range split {
+			var step recipes.Step
+			step.Index = i
+			step.Text = cleaners.Clean(st)
+			step.HasTimer = recipes.ParseTimerRequired(st)
+			recipe.Steps = append(recipe.Steps, step)
 		}
-
-		recipe.Steps = append(recipe.Steps, step)
 	})
 
 	c.OnError(func(r *colly.Response, err error) {
-		fmt.Println("Request URL: ", r.Request.URL, "failed with response: ", r, "Error: ", err.Error())
+		fmt.Println("Request URL: ", r.Request.URL, "failed with response: ", string(r.Body), "Error: ", err.Error())
 	})
 
 	err := c.Visit(rawURL)
