@@ -15,15 +15,18 @@ class Scraper:
         "Mozilla/5.0 (X11; Linux i686; rv:124.0) Gecko/20100101 Firefox/124.0"
     ]
 
+
     def __init__(self, raw_url:str):
         try:
             self.__recipe = self.__scrape_recipe(raw_url)
         except Exception:
             raise Exception
 
+    
     def __select_user_agent(self):        
         agent = random.choice(self.__user_agents)
         return agent
+    
     
     def __get_headers(self):
         user_agent = self.__select_user_agent()
@@ -31,15 +34,18 @@ class Scraper:
             "User-Agent": user_agent
         }
     
+    
     def __get_html(self, raw_url:str):
         res = requests.get(raw_url, headers=self.__get_headers())
         html = res.text
         return html
     
+    
     def __scrape_recipe(self, raw_url:str):
         html = self.__get_html(raw_url)
         scraper = scrape_html(html, org_url=raw_url)
         return scraper
+    
     
     def recipe(self):
         return self.__recipe
