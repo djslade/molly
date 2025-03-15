@@ -19,7 +19,8 @@ class Scraper:
     def __init__(self, raw_url:str):
         try:
             self.__recipe = self.__scrape_recipe(raw_url)
-        except Exception:
+        except Exception as err:
+            print(err)
             raise Exception
 
     
