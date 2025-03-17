@@ -1,17 +1,27 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Inject } from '@nestjs/common';
 import { AppService } from './app.service';
-
-interface response {
-  status: string;
-}
-
-interface resGetRecipe extends response {
-  status: string;
-}
+import { EventPattern, Payload } from '@nestjs/microservices';
+import { ScraperGateway } from './scraper/scraper.gateway';
+import { ScraperModule } from './scraper/scraper.module';
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  constructor(
+    private readonly appService: AppService,
+    private readonly scraperGateway: ScraperGateway,
+  ) {}
+
+  @EventPattern(undefined)
+  handleScraperResults(
+    @Payload() data: { recipe_url: string; status: string },
+  ) {
+    try {
+      this.scraperGateway.handleScrapeResult(data.recipe_url, data.status);
+    } catch (error) {
+      console.log(data);
+      console.error(error);
+    }
+  }
 
   @Get()
   getHello(): string {
