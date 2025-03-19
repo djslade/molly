@@ -3,22 +3,25 @@ from recipe_scrapers import AbstractScraper
 from exceptions import InvalidRecipeDataException
 
 class Recipe:
-    def __init__(self, title, ingredients, instructions, recipe_scraper:AbstractScraper):
+    def __init__(self, title, ingredients, instructions, recipe_url, recipe_scraper:AbstractScraper):
         try:
-            self._init_required_fields(title, ingredients, instructions)
+            self._init_required_fields(title, recipe_url, ingredients, instructions)
             self._init_optional_fields(recipe_scraper)
         except InvalidRecipeDataException as err:
             raise err
  
     
-    def _init_required_fields(self, title:str, ingredients:list, instructions:list):
+    def _init_required_fields(self, title:str, recipe_url:str, ingredients:list, instructions:list):
         if title == "":
             raise InvalidRecipeDataException("Recipe is missing a title")
+        if recipe_url == "":
+            raise InvalidRecipeDataException("Recipe is missing a url")
         if len(ingredients) == 0:
             raise InvalidRecipeDataException("Recipe is missing ingredients")
         if len(instructions) == 0:
             raise InvalidRecipeDataException("Recipe is missing instructions")
         self.__title = title
+        self.__recipe_url = recipe_url
         self.__ingredients = ingredients
         self.__instructions = instructions
     
@@ -76,6 +79,7 @@ class Recipe:
             raise Exception("recipe data is invalid")
         data = {
             "title": self.__title,
+            "recipe_url": self.__recipe_url,
             "description": self.__description,
             "cuisine": self.__cuisine,
             "cooking_method": self.__cooking_method,

@@ -2,6 +2,7 @@ from scraper import Scraper
 from recipe import Recipe
 from ingredient_formatter import IngredientFormatter
 from instruction_formatter import InstructionFormatter
+from poster import Poster
 from pub_sub import PubSub
 import json
 
@@ -18,8 +19,15 @@ def handle_scrape_request(channel, method, properties, body):
             title = scraper.recipe().title()
             ingredients = IngredientFormatter().format(scraper.recipe().ingredients())
             instructions = InstructionFormatter().format(scraper.recipe().instructions_list())
-            recipe = Recipe(recipe_scraper=scraper.recipe(), title=title, ingredients=ingredients, instructions=instructions)
-            print(recipe.json())
+            recipe = Recipe(
+                recipe_scraper=scraper.recipe(), 
+                title=title, 
+                recipe_url=recipe_url, 
+                ingredients=ingredients, 
+                instructions=instructions
+            )
+            if not Poster().post_successful(recipe.json()):
+                raise Exception("could not save url to database")
             response = {
                 "recipe_url": recipe_url,
                 "status": "success"

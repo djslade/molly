@@ -4,8 +4,9 @@ import {
   SubscribeMessage,
   WebSocketGateway,
   OnGatewayDisconnect,
+  WebSocketServer,
 } from '@nestjs/websockets';
-import { Socket } from 'socket.io';
+import { Socket, Server } from 'socket.io';
 
 @WebSocketGateway()
 export class ScraperGateway implements OnGatewayDisconnect {
@@ -13,6 +14,8 @@ export class ScraperGateway implements OnGatewayDisconnect {
     @Inject('SCRAPER_REQUESTS') private readonly scraperRequests: ClientProxy,
   ) {}
   clients: Map<string, Set<Socket>> = new Map();
+
+  @WebSocketServer() private server: Server;
 
   handleDisconnect(client: Socket) {
     this.clients.forEach((set) => set.delete(client));
