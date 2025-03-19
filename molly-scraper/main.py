@@ -1,13 +1,15 @@
-from scraper import Scraper
-from recipe import Recipe
-from ingredient_formatter import IngredientFormatter
-from instruction_formatter import InstructionFormatter
-from poster import Poster
-from pub_sub import PubSub
+from scraper.scraper import Scraper
+from recipe.recipe import Recipe
+from formatters.ingredient_formatter import IngredientFormatter
+from formatters.instruction_formatter import InstructionFormatter
+from poster.poster import Poster
+from pubsub.pub_sub import PubSub
 import json
+from pika.channel import Channel
+from pika.spec import Basic, BasicProperties
 
 
-def handle_scrape_request(channel, method, properties, body):
+def handle_scrape_request(channel:Channel, method:Basic.Deliver, properties:BasicProperties, body:bytes) -> None:
     try:
         json_body = json.loads(body)
         recipe_url = json_body["data"]["url"]
@@ -41,7 +43,7 @@ def handle_scrape_request(channel, method, properties, body):
                 "status": "failed"
             }
             channel.basic_publish(exchange="", routing_key="scraper_results", body=json.dumps(response))
-            channel.basic_ack(delivery_tag=method.delivery_tag)
+            channel.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
 
 
 def main():

@@ -1,14 +1,14 @@
 import { Controller, Get, Inject } from '@nestjs/common';
 import { AppService } from './app.service';
-import { EventPattern, Payload } from '@nestjs/microservices';
+import { ClientProxy, EventPattern, Payload } from '@nestjs/microservices';
 import { ScraperGateway } from './scraper/scraper.gateway';
-import { ScraperModule } from './scraper/scraper.module';
 
 @Controller()
 export class AppController {
   constructor(
     private readonly appService: AppService,
     private readonly scraperGateway: ScraperGateway,
+    @Inject('CACHE_SERVICE') private readonly cacheService: ClientProxy,
   ) {}
 
   @EventPattern(undefined)

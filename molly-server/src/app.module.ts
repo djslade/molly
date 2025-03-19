@@ -4,9 +4,10 @@ import { AppService } from './app.service';
 import { RecipesModule } from './recipes/recipes.module';
 import { PubSubModule } from './pubsub.module';
 import { ScraperModule } from './scraper/scraper.module';
+import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
-  imports: [RecipesModule, PubSubModule, ScraperModule],
+  imports: [RecipesModule, PubSubModule, ScraperModule, CacheModule.register()],
   controllers: [AppController],
   providers: [AppService],
 })

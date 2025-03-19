@@ -10,5 +10,4 @@ class Poster:
     
     def post_successful(self, body:str) -> bool:
         res = self.post(body)
-        print(res.status_code)
         return res.status_code == 201

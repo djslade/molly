@@ -6,7 +6,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   await app.listen(process.env.PORT ?? 3000);
 
-  const microservice = app.connectMicroservice<MicroserviceOptions>({
+  const rabbitmqMS = app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.RMQ,
     options: {
       urls: ['amqp://localhost:5672'],
@@ -15,7 +15,7 @@ async function bootstrap() {
     },
   });
 
-  await microservice.listen();
+  await rabbitmqMS.listen();
 }
 
 bootstrap();
