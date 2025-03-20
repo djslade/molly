@@ -1,17 +1,26 @@
-import { Controller, Get, Inject } from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
 import { AppService } from './app.service';
-import { ClientProxy, EventPattern, Payload } from '@nestjs/microservices';
+import { EventPattern, MessagePattern, Payload } from '@nestjs/microservices';
 import { ScraperGateway } from './scraper/scraper.gateway';
+import { SubscribeMessage } from '@nestjs/websockets';
+import { Socket } from 'socket.io';
+import { PubsubService } from './pubsub/pubsub.service';
 
 @Controller()
 export class AppController {
   constructor(
     private readonly appService: AppService,
     private readonly scraperGateway: ScraperGateway,
-    @Inject('CACHE_SERVICE') private readonly cacheService: ClientProxy,
+    private readonly pubsubService: PubsubService,
   ) {}
 
-  @EventPattern(undefined)
+  @MessagePattern('scrape')
+  handleScraperRequests(client: Socket, payload: any) {
+    this.scraperGateway.registerClient(client, payload);
+    this.pubsubService.sendScraperRequest({ url: payload.url });
+  }
+
+  @MessagePattern('scraper.results')
   handleScraperResults(
     @Payload() data: { recipe_url: string; status: string },
   ) {

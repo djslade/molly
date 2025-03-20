@@ -1,7 +1,7 @@
 import pika, os
 
 
-class PubSub():
+class Pubsub():
     def __init__(self):
         self.user = os.getenv("RABBITMQ_USER", "guest")
         self.password = os.getenv("RABBITMQ_PASSWORD", "guest")
@@ -27,7 +27,7 @@ class PubSub():
     def declare_channel(self, queue_name):
         if not self.channel:
             raise Exception("Connection is not established")
-        self.channel.queue_declare(queue=queue_name, durable=True)
+        self.channel.queue_declare(queue=queue_name, durable=False)
 
 
     def consume(self, queue_name, callback):

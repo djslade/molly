@@ -1,5 +1,3 @@
-import { Inject } from '@nestjs/common';
-import { ClientProxy } from '@nestjs/microservices';
 import {
   SubscribeMessage,
   WebSocketGateway,
@@ -7,12 +5,11 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Socket, Server } from 'socket.io';
+import { PubsubService } from 'src/pubsub/pubsub.service';
 
 @WebSocketGateway()
 export class ScraperGateway implements OnGatewayDisconnect {
-  constructor(
-    @Inject('SCRAPER_REQUESTS') private readonly scraperRequests: ClientProxy,
-  ) {}
+  constructor(private readonly pubsubService: PubsubService) {}
   clients: Map<string, Set<Socket>> = new Map();
 
   @WebSocketServer() private server: Server;
@@ -21,22 +18,12 @@ export class ScraperGateway implements OnGatewayDisconnect {
     this.clients.forEach((set) => set.delete(client));
   }
 
-  private registerClient(client: Socket, key: string) {
+  registerClient(client: Socket, key: string) {
     if (!this.clients.get(key)) {
       this.clients.set(key, new Set<Socket>());
     }
     console.log('Clients:', this.clients);
     this.clients.get(key)?.add(client);
-  }
-
-  @SubscribeMessage('scrape')
-  handleScrapeRequest(client: Socket, payload: any) {
-    try {
-      this.registerClient(client, payload.url);
-    } catch (error) {
-      client.disconnect(true);
-    }
-    this.scraperRequests.emit('scraper_requests', { url: payload.url });
   }
 
   handleScrapeResult(url: string, status: string) {

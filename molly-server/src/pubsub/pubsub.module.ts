@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+import { PubsubService } from './pubsub.service';
 
 @Module({
   imports: [
@@ -9,8 +10,8 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
         transport: Transport.RMQ,
         options: {
           urls: ['amqp://localhost:5672'],
-          queue: 'scraper_requests',
-          queueOptions: { durable: true },
+          queue: 'scraper.requests',
+          queueOptions: { durable: false },
         },
       },
       {
@@ -18,12 +19,13 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
         transport: Transport.RMQ,
         options: {
           urls: ['amqp://localhost:5672'],
-          queue: 'scraper_results',
-          queueOptions: { durable: true },
+          queue: 'scraper.results',
+          queueOptions: { durable: false },
         },
       },
     ]),
   ],
-  exports: [ClientsModule],
+  providers: [PubsubService],
+  exports: [ClientsModule, PubsubService],
 })
-export class PubSubModule {}
+export class PubsubModule {}

@@ -3,7 +3,7 @@ from recipe.recipe import Recipe
 from formatters.ingredient_formatter import IngredientFormatter
 from formatters.instruction_formatter import InstructionFormatter
 from poster.poster import Poster
-from pubsub.pub_sub import PubSub
+from pubsub.pubsub import Pubsub
 import json
 from pika.channel import Channel
 from pika.spec import Basic, BasicProperties
@@ -34,7 +34,7 @@ def handle_scrape_request(channel:Channel, method:Basic.Deliver, properties:Basi
                 "recipe_url": recipe_url,
                 "status": "success"
             }
-            channel.basic_publish(exchange="", routing_key="scraper_results", body=json.dumps(response))
+            channel.basic_publish(exchange="", routing_key="scraper.results", body=json.dumps(response))
             channel.basic_ack(delivery_tag=method.delivery_tag)
         except Exception as err:
             print(err)
@@ -42,17 +42,17 @@ def handle_scrape_request(channel:Channel, method:Basic.Deliver, properties:Basi
                 "recipe_url": recipe_url,
                 "status": "failed"
             }
-            channel.basic_publish(exchange="", routing_key="scraper_results", body=json.dumps(response))
+            channel.basic_publish(exchange="", routing_key="scraper.results", body=json.dumps(response))
             channel.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
 
 
 def main():
     try:
-        pubsub = PubSub()
+        ps = Pubsub()
         print("Connection to message broker established")
-        pubsub.declare_channel(queue_name="scraper_requests")
-        pubsub.declare_channel(queue_name="scraper_results")
-        pubsub.consume(queue_name="scraper_requests", callback=handle_scrape_request)
+        ps.declare_channel(queue_name="scraper.requests")
+        ps.declare_channel(queue_name="scraper.results")
+        ps.consume(queue_name="scraper.requests", callback=handle_scrape_request)
     except Exception as err:
         print(f"Failed to establish connection to message broker: {err}")
 
