@@ -9,11 +9,19 @@ export class PubsubService {
   ) {}
 
   async sendScraperRequest(data: any) {
-    return this.scraperRequests.emit('scraper.requests', data);
+    try {
+      return this.scraperRequests.emit('scraper.requests', data);
+    } catch (err) {
+      console.error(err);
+    }
   }
 
   async onApplicationBootstrap() {
-    await this.scraperRequests.connect();
-    await this.scraperResults.connect();
+    try {
+      await this.scraperRequests.connect();
+      await this.scraperResults.connect();
+    } catch (err) {
+      console.error(err);
+    }
   }
 }

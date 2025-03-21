@@ -16,7 +16,7 @@ func normalizeUrl(s string) (string, error) {
 	if err != nil {
 		return "", errInvalidUrl
 	}
-	if parsed.Scheme == "" || parsed.Host == "" {
+	if parsed.Host == "" {
 		return "", errInvalidUrl
 	}
 

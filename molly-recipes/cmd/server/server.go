@@ -15,22 +15,19 @@ func newServer(db *database.Queries, logger *log.Logger) *server {
 }
 
 func (srv *server) GetRecipeWithURL(ctx context.Context, req *pb.GetRecipeWithURLRequest) (*pb.RecipeResponse, error) {
+	srv.logger.Println(req)
 	recipeURL, err := normalizeUrl(req.GetRecipeUrl())
 	if err != nil {
-		return nil, errors.New("could not normalize recipe URL")
+		return nil, ErrInvalidRecipeURL
 	}
 
 	foundRecipe, err := srv.db.GetRecipeByURL(ctx, recipeURL)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return &pb.RecipeResponse{
-				Status: "Not found",
-			}, errors.New("could not find recipe")
+			return nil, ErrRecipeNotFound
 		}
 		srv.logger.Printf("database error: %v", err.Error())
-		return &pb.RecipeResponse{
-			Status: "Internal server error",
-		}, errors.New("the server encountered an error")
+		return nil, ErrInternalServerError
 	}
 
 	recipe := pb.Recipe{
@@ -52,9 +49,8 @@ func (srv *server) GetRecipeWithURL(ctx context.Context, req *pb.GetRecipeWithUR
 
 	foundIngredients, err := srv.db.GetIngredientsByRecipeID(ctx, foundRecipe.ID)
 	if err != nil {
-		return &pb.RecipeResponse{
-			Status: "Internal server error",
-		}, errors.New("the server encountered an error")
+		srv.logger.Printf("database error: %v", err.Error())
+		return nil, ErrInternalServerError
 	}
 
 	var ingredients []*pb.Ingredient
@@ -75,18 +71,16 @@ func (srv *server) GetRecipeWithURL(ctx context.Context, req *pb.GetRecipeWithUR
 
 	foundInstructions, err := srv.db.GetInstructionsByRecipeID(ctx, foundRecipe.ID)
 	if err != nil {
-		return &pb.RecipeResponse{
-			Status: "Internal server error",
-		}, errors.New("the server encountered an error")
+		srv.logger.Printf("database error: %v", err.Error())
+		return nil, ErrInternalServerError
 	}
 
 	var instructions []*pb.Instruction
 	for _, inst := range foundInstructions {
 		foundTimers, err := srv.db.GetTimersByInstructionID(ctx, inst.ID)
 		if err != nil {
-			return &pb.RecipeResponse{
-				Status: "Internal server error",
-			}, errors.New("the server encountered an error")
+			srv.logger.Printf("database error: %v", err.Error())
+			return nil, ErrInternalServerError
 		}
 		var timers []*pb.Timer
 		for _, tmr := range foundTimers {
@@ -118,9 +112,7 @@ func (srv *server) GetRecipeWithURL(ctx context.Context, req *pb.GetRecipeWithUR
 func (srv *server) CreateRecipe(ctx context.Context, req *pb.CreateRecipeRequest) (*pb.CreateRecipeResponse, error) {
 	recipeURL, err := normalizeUrl(req.GetRecipeUrl())
 	if err != nil {
-		return &pb.CreateRecipeResponse{
-			Status: "Bad request",
-		}, errors.New("could not normalize recipe URL")
+		return nil, ErrInvalidRecipeURL
 	}
 
 	recipe, err := srv.db.CreateRecipe(ctx, database.CreateRecipeParams{
@@ -138,7 +130,8 @@ func (srv *server) CreateRecipe(ctx context.Context, req *pb.CreateRecipeRequest
 		TotalTimeString:  req.GetTotalTime(),
 	})
 	if err != nil {
-		return nil, err
+		srv.logger.Printf("database error: %v", err.Error())
+		return nil, ErrInternalServerError
 	}
 
 	for _, ingredient := range req.GetIngredients() {
@@ -152,7 +145,8 @@ func (srv *server) CreateRecipe(ctx context.Context, req *pb.CreateRecipeRequest
 			Size:       ingredient.GetSize(),
 		})
 		if err != nil {
-			return nil, err
+			srv.logger.Printf("database error: %v", err.Error())
+			return nil, ErrInternalServerError
 		}
 	}
 
@@ -163,7 +157,8 @@ func (srv *server) CreateRecipe(ctx context.Context, req *pb.CreateRecipeRequest
 			FullText: instruction.FullText,
 		})
 		if err != nil {
-			return nil, err
+			srv.logger.Printf("database error: %v", err.Error())
+			return nil, ErrInternalServerError
 		}
 
 		for _, timer := range instruction.GetTimers() {
@@ -173,7 +168,8 @@ func (srv *server) CreateRecipe(ctx context.Context, req *pb.CreateRecipeRequest
 				Value:         timer.Value,
 			})
 			if err != nil {
-				return nil, err
+				srv.logger.Printf("database error: %v", err.Error())
+				return nil, ErrInternalServerError
 			}
 		}
 	}
