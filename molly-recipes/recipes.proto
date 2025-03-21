@@ -1,0 +1,108 @@
+syntax = "proto3";
+
+option go_package = "internal/proto";
+
+package recipes;
+
+service RecipesService {
+    rpc GetRecipeWithURL (GetRecipeWithURLRequest) returns (RecipeResponse);
+    rpc CreateRecipe (CreateRecipeRequest) returns (CreateRecipeResponse);
+}
+
+message CRTimer {
+    int32 value = 1;
+    string unit = 2;
+}
+
+message CRInstruction {
+    int32 index = 1;
+    string full_text = 2;
+    repeated CRTimer timers = 3;
+}
+
+message CRIngredient {
+    string full_text = 1;
+    bool is_optional = 2;
+    string name = 3;
+    string quantity = 4;
+    string unit = 5;
+    string size = 6;
+}
+
+message CreateRecipeRequest {
+    string recipe_url = 1;
+    string title = 2;
+    string description = 3;
+    string cooking_method = 4;
+    string category = 5;
+    string image_url = 6;
+    int32 prep_time_minutes = 7;
+    string prep_time = 8;
+    int32 cook_time_minutes = 9;
+    string cook_time = 10;
+    int32 total_time_minutes = 11;
+    string total_time = 12;
+    repeated CRIngredient ingredients = 13;
+    repeated CRInstruction instructions = 14;
+}
+
+message Timer {
+    string id = 1;
+    string instruction_id = 2;
+    int32 value = 3;
+    string unit = 4;
+    string created = 5;
+}
+
+message Instruction {
+    string id = 1;
+    string recipe_id = 2;
+    int32 index = 3;
+    string full_text = 4;
+    repeated Timer timers = 5;
+    string created = 6;
+}
+
+message Ingredient {
+    string id = 1;
+    string recipe_id = 2;
+    string full_text = 3;
+    bool is_optional = 4;
+    string name = 5;
+    string quantity = 6;
+    string unit = 7;
+    string size = 8;
+    string created = 9;
+}
+
+message Recipe {
+    string id = 1;
+    string recipe_url = 2;
+    string title = 3;
+    string description = 4;
+    string cooking_method = 5;
+    string category = 6;
+    string image_url = 7;
+    int32 prep_time_minutes = 8;
+    string prep_time = 9;
+    int32 cook_time_minutes = 10;
+    string cook_time = 11;
+    int32 total_time_minutes = 12;
+    string total_time = 13;
+    repeated Ingredient ingredients = 14;
+    repeated Instruction instructions = 15;
+    string created = 16;
+}
+
+message GetRecipeWithURLRequest {
+    string recipe_url = 1;
+}
+
+message RecipeResponse {
+    string status = 1;
+    Recipe recipe = 2;
+}
+
+message CreateRecipeResponse {
+    string status = 1;
+}

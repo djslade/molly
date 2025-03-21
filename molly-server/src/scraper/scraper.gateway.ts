@@ -1,37 +1,28 @@
 import {
-  SubscribeMessage,
   WebSocketGateway,
+  OnGatewayConnection,
   OnGatewayDisconnect,
-  WebSocketServer,
+  SubscribeMessage,
 } from '@nestjs/websockets';
-import { Socket, Server } from 'socket.io';
-import { PubsubService } from 'src/pubsub/pubsub.service';
+import { Socket } from 'socket.io';
 
 @WebSocketGateway()
-export class ScraperGateway implements OnGatewayDisconnect {
-  constructor(private readonly pubsubService: PubsubService) {}
-  clients: Map<string, Set<Socket>> = new Map();
+export class ScraperGateway
+  implements OnGatewayConnection, OnGatewayDisconnect
+{
+  clients: Socket[];
 
-  @WebSocketServer() private server: Server;
+  handleConnection(client: Socket) {
+    this.clients.push(client);
+  }
 
   handleDisconnect(client: Socket) {
-    this.clients.forEach((set) => set.delete(client));
+    this.clients = this.clients.filter((c) => c.id != client.id);
   }
 
-  registerClient(client: Socket, key: string) {
-    if (!this.clients.get(key)) {
-      this.clients.set(key, new Set<Socket>());
-    }
-    console.log('Clients:', this.clients);
-    this.clients.get(key)?.add(client);
-  }
-
-  handleScrapeResult(url: string, status: string) {
-    console.log(url);
-    console.log(status);
-    this.clients.get(url)?.forEach((c) => {
-      c.emit('scrape', { status });
-      c.disconnect(true);
-    });
+  @SubscribeMessage('scrape.request')
+  handleScrapeResult(recipeURL: string, status: string) {
+    const event = `scrape.${recipeURL}`;
+    this.clients.forEach((c) => c.emit(event, status));
   }
 }

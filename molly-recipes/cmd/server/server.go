@@ -1,0 +1,184 @@
+package main
+
+import (
+	"context"
+	"database/sql"
+	"errors"
+	"log"
+
+	"github.com/djslade/molly-recipes/internal/database"
+	pb "github.com/djslade/molly-recipes/internal/proto"
+)
+
+func newServer(db *database.Queries, logger *log.Logger) *server {
+	return &server{db: db, logger: logger}
+}
+
+func (srv *server) GetRecipeWithURL(ctx context.Context, req *pb.GetRecipeWithURLRequest) (*pb.RecipeResponse, error) {
+	recipeURL, err := normalizeUrl(req.GetRecipeUrl())
+	if err != nil {
+		return nil, errors.New("could not normalize recipe URL")
+	}
+
+	foundRecipe, err := srv.db.GetRecipeByURL(ctx, recipeURL)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return &pb.RecipeResponse{
+				Status: "Not found",
+			}, errors.New("could not find recipe")
+		}
+		srv.logger.Printf("database error: %v", err.Error())
+		return &pb.RecipeResponse{
+			Status: "Internal server error",
+		}, errors.New("the server encountered an error")
+	}
+
+	recipe := pb.Recipe{
+		Id:               foundRecipe.ID.String(),
+		RecipeUrl:        foundRecipe.RecipeUrl,
+		Title:            foundRecipe.Title,
+		Description:      foundRecipe.Description,
+		CookingMethod:    foundRecipe.CookingMethod,
+		Category:         foundRecipe.Category,
+		ImageUrl:         foundRecipe.ImageUrl,
+		PrepTimeMinutes:  foundRecipe.PrepTimeMinutes,
+		PrepTime:         foundRecipe.PrepTimeString,
+		CookTimeMinutes:  foundRecipe.CookTimeMinutes,
+		CookTime:         foundRecipe.CookTimeString,
+		TotalTimeMinutes: foundRecipe.TotalTimeMinutes,
+		TotalTime:        foundRecipe.TotalTimeString,
+		Created:          foundRecipe.Created.String(),
+	}
+
+	foundIngredients, err := srv.db.GetIngredientsByRecipeID(ctx, foundRecipe.ID)
+	if err != nil {
+		return &pb.RecipeResponse{
+			Status: "Internal server error",
+		}, errors.New("the server encountered an error")
+	}
+
+	var ingredients []*pb.Ingredient
+	for _, ing := range foundIngredients {
+		ingredients = append(ingredients, &pb.Ingredient{
+			Id:         ing.ID.String(),
+			RecipeId:   ing.RecipeID.String(),
+			FullText:   ing.FullText,
+			IsOptional: ing.IsOptional,
+			Name:       ing.Name,
+			Quantity:   ing.Quantity,
+			Unit:       ing.Unit,
+			Size:       ing.Size,
+			Created:    ing.Created.String(),
+		})
+	}
+	recipe.Ingredients = ingredients
+
+	foundInstructions, err := srv.db.GetInstructionsByRecipeID(ctx, foundRecipe.ID)
+	if err != nil {
+		return &pb.RecipeResponse{
+			Status: "Internal server error",
+		}, errors.New("the server encountered an error")
+	}
+
+	var instructions []*pb.Instruction
+	for _, inst := range foundInstructions {
+		foundTimers, err := srv.db.GetTimersByInstructionID(ctx, inst.ID)
+		if err != nil {
+			return &pb.RecipeResponse{
+				Status: "Internal server error",
+			}, errors.New("the server encountered an error")
+		}
+		var timers []*pb.Timer
+		for _, tmr := range foundTimers {
+			timers = append(timers, &pb.Timer{
+				Id:            tmr.ID.String(),
+				InstructionId: tmr.InstructionID.String(),
+				Value:         tmr.Value,
+				Unit:          tmr.Unit,
+				Created:       tmr.Created.String(),
+			})
+		}
+		instructions = append(instructions, &pb.Instruction{
+			Id:       inst.ID.String(),
+			RecipeId: inst.RecipeID.String(),
+			Index:    inst.Index,
+			FullText: inst.FullText,
+			Timers:   timers,
+			Created:  inst.Created.String(),
+		})
+	}
+	recipe.Instructions = instructions
+
+	return &pb.RecipeResponse{
+		Status: "OK",
+		Recipe: &recipe,
+	}, nil
+}
+
+func (srv *server) CreateRecipe(ctx context.Context, req *pb.CreateRecipeRequest) (*pb.CreateRecipeResponse, error) {
+	recipeURL, err := normalizeUrl(req.GetRecipeUrl())
+	if err != nil {
+		return &pb.CreateRecipeResponse{
+			Status: "Bad request",
+		}, errors.New("could not normalize recipe URL")
+	}
+
+	recipe, err := srv.db.CreateRecipe(ctx, database.CreateRecipeParams{
+		RecipeUrl:        recipeURL,
+		Title:            req.GetTitle(),
+		Description:      req.GetDescription(),
+		CookingMethod:    req.GetCookingMethod(),
+		Category:         req.GetCategory(),
+		ImageUrl:         req.GetImageUrl(),
+		PrepTimeMinutes:  req.GetPrepTimeMinutes(),
+		PrepTimeString:   req.GetPrepTime(),
+		CookTimeMinutes:  req.GetCookTimeMinutes(),
+		CookTimeString:   req.GetCookTime(),
+		TotalTimeMinutes: req.GetTotalTimeMinutes(),
+		TotalTimeString:  req.GetTotalTime(),
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	for _, ingredient := range req.GetIngredients() {
+		_, err := srv.db.CreateIngredient(ctx, database.CreateIngredientParams{
+			RecipeID:   recipe.ID,
+			FullText:   ingredient.GetFullText(),
+			IsOptional: ingredient.GetIsOptional(),
+			Name:       ingredient.GetName(),
+			Quantity:   ingredient.GetQuantity(),
+			Unit:       ingredient.GetUnit(),
+			Size:       ingredient.GetSize(),
+		})
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	for _, instruction := range req.GetInstructions() {
+		newInstruction, err := srv.db.CreateInstruction(ctx, database.CreateInstructionParams{
+			RecipeID: recipe.ID,
+			Index:    instruction.Index,
+			FullText: instruction.FullText,
+		})
+		if err != nil {
+			return nil, err
+		}
+
+		for _, timer := range instruction.GetTimers() {
+			_, err := srv.db.CreateTimer(ctx, database.CreateTimerParams{
+				InstructionID: newInstruction.ID,
+				Unit:          timer.Unit,
+				Value:         timer.Value,
+			})
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	return &pb.CreateRecipeResponse{
+		Status: "Created",
+	}, nil
+}

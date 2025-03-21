@@ -2,56 +2,61 @@ package main
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
-	"net/http"
+	"net"
 	"os"
-	"time"
 
 	"github.com/djslade/molly-recipes/internal/database"
+	pb "github.com/djslade/molly-recipes/internal/proto"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
+	"google.golang.org/grpc"
 )
 
-type application struct {
-	logger *log.Logger
+type server struct {
+	pb.RecipesServiceServer
 	db     *database.Queries
+	logger *log.Logger
 }
 
 func main() {
+	logger := log.New(os.Stdout, "", log.Ldate|log.Ltime)
+
 	godotenv.Load()
+
 	port := os.Getenv("PORT")
 	if port == "" {
-		fmt.Println("'PORT' is not defined")
+		logger.Println("'PORT' is not defined")
+		os.Exit(1)
 	}
 	dbURL := os.Getenv("POSTGRES_CONNECTION_STRING")
 	if dbURL == "" {
-		fmt.Println("'POSTGRES_CONNECTION_STRING' is not defined")
+		logger.Println("'POSTGRES_CONNECTION_STRING' is not defined")
 		os.Exit(1)
 	}
 
 	db, err := sql.Open("postgres", dbURL)
 	if err != nil {
-		fmt.Println("Could not connect to database: ", err)
+		logger.Printf("Could not connect to database: %v\n", err)
 		os.Exit(1)
 	}
-	dbQueries := database.New(db)
 
-	app := &application{
-		db:     dbQueries,
-		logger: log.New(os.Stdout, "", log.Ldate|log.Ltime),
+	queries := database.New(db)
+
+	listener, err := net.Listen("tcp", ":"+port)
+	if err != nil {
+		logger.Printf("failed to serve: %v\n", err)
+		os.Exit(1)
 	}
 
-	srv := &http.Server{
-		Addr:         ":" + port,
-		Handler:      app.routes(),
-		IdleTimeout:  time.Minute,
-		ReadTimeout:  time.Second * 10,
-		WriteTimeout: time.Second * 30,
-	}
+	srv := grpc.NewServer()
 
-	app.logger.Printf("server started on port %s\n", srv.Addr)
-	if err := srv.ListenAndServe(); err != nil {
-		app.logger.Fatal(err)
+	pb.RegisterRecipesServiceServer(srv, newServer(queries, logger))
+
+	log.Printf("server listening at port %v\n", listener.Addr())
+
+	if err := srv.Serve(listener); err != nil {
+		logger.Printf("failed to serve: %v\n", err)
+		os.Exit(1)
 	}
 }
