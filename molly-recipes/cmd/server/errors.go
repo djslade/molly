@@ -1,9 +1,21 @@
 package main
 
-import "errors"
+import (
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+)
 
 var (
-	ErrInvalidRecipeURL    error = errors.New("recipe URL is invalid")
-	ErrRecipeNotFound      error = errors.New("recipe with supplied URL not found in database")
-	ErrInternalServerError error = errors.New("the server encountered an internal error and could not resolve the request")
+	ErrInvalidRecipeURL error = status.Error(
+		codes.InvalidArgument,
+		"recipe ID is invalid",
+	)
+	ErrRecipeNotFound error = status.Error(
+		codes.NotFound,
+		"recipe with supplied URL not found in database",
+	)
+	ErrInternalServerError error = status.Error(
+		codes.Internal,
+		"the server encountered an internal error and could not resolve the request",
+	)
 )

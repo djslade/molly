@@ -35,6 +35,7 @@ export class ScraperGateway
     const recipe = await this.cacheManager.get(`recipe-${payload.url}`);
     if (recipe !== null) {
       client.emit('scrape', recipe);
+      return;
     }
     try {
       const res = await this.recipesService.getRecipeWithURL(payload.url);

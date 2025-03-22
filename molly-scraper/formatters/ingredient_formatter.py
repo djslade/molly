@@ -1,4 +1,4 @@
-from formatter import Formatter
+from .formatter import Formatter
 from ingredient_parser import parse_ingredient
 
 class IngredientFormatter(Formatter):

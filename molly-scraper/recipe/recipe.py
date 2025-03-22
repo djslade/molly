@@ -1,6 +1,6 @@
-import json
 from recipe_scrapers import AbstractScraper
-from exceptions import InvalidRecipeDataException
+from exceptions.exceptions import InvalidRecipeDataException
+from recipes_pb2 import CreateRecipeRequest
 
 class Recipe:
     def __init__(self, title, ingredients, instructions, recipe_url, recipe_scraper:AbstractScraper):
@@ -56,7 +56,7 @@ class Recipe:
     def __set_field(self, fn, default_value):
         try:
             return fn()
-        except Exception as err:
+        except Exception:
             return default_value
 
 
@@ -74,7 +74,7 @@ class Recipe:
             return False
     
 
-    def json(self) -> str:
+    def json(self) -> dict:
         if not self.is_valid():
             raise Exception("recipe data is invalid")
         data = {
@@ -95,4 +95,27 @@ class Recipe:
             "ingredients": self.__ingredients,
             "instructions": self.__instructions,
         }
-        return json.dumps(data)
+        return data
+    
+    def grpc_create_recipe_request(self) -> CreateRecipeRequest:
+        if not self.is_valid():
+            raise Exception("recipe data is invalid")
+        request = CreateRecipeRequest(
+            title=self.__title,
+            recipe_url=self.__recipe_url,
+            description=self.__description,
+            cuisine=self.__cuisine,
+            cooking_method=self.__cooking_method,
+            category=self.__category,
+            image_url=self.__image_url,
+            yields=self.__yields,
+            prep_time_minutes=self.__prep_time,
+            prep_time=self._format_time(self.__prep_time),
+            cook_time_minutes=self.__cook_time,
+            cook_time=self._format_time(self.__cook_time),
+            total_time_minutes=self.__total_time,
+            total_time=self._format_time(self.__total_time),
+            ingredients=self.__ingredients,
+            instructions=self.__instructions,
+        )
+        return request

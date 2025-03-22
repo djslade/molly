@@ -1,4 +1,4 @@
-from formatter import Formatter
+from .formatter import Formatter
 
 class InstructionFormatter(Formatter):
     def _set_timers(self, instruction:dict, timers:list) -> None:

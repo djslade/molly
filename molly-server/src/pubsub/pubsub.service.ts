@@ -5,7 +5,6 @@ import { ClientProxy } from '@nestjs/microservices';
 export class PubsubService {
   constructor(
     @Inject('SCRAPER_REQUESTS') private readonly scraperRequests: ClientProxy,
-    @Inject('SCRAPER_RESULTS') private readonly scraperResults: ClientProxy,
   ) {}
 
   async sendScraperRequest(data: any) {
@@ -19,7 +18,6 @@ export class PubsubService {
   async onApplicationBootstrap() {
     try {
       await this.scraperRequests.connect();
-      await this.scraperResults.connect();
     } catch (err) {
       console.error(err);
     }
