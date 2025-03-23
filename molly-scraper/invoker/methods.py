@@ -1,10 +1,9 @@
 from .invoker import Invoker
 import grpc
-import recipes_pb2_grpc
+from protoc import RecipesServiceStub
 
 def new_invoker() -> Invoker:
-    credentials = grpc.ChannelCredentials()
-    grpc_channel = grpc.secure_channel("localhost:8080", credentials)
-    stub = recipes_pb2_grpc.RecipesServiceStub(grpc_channel)
-    creator = Invoker(stub=stub)
-    return creator
+    grpc_channel = grpc.insecure_channel("localhost:8080")
+    stub = RecipesServiceStub(grpc_channel)
+    invoker = Invoker(stub=stub)
+    return invoker

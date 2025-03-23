@@ -13,7 +13,7 @@ class IngredientFormatter(Formatter):
 
     def _set_parsed_fields(self, raw_ingredient:str, new_ingredient:dict) -> None:
         try:
-            pid = parse_ingredient(raw_ingredient, separate_names=False, foundation_foods=True)
+            pid = parse_ingredient(sentence=raw_ingredient, separate_names=False, foundation_foods=True)
             foundation_food = "" if len(pid.foundation_foods) == 0 else pid.foundation_foods[0].text
             if foundation_food != "":
                 new_ingredient["name"] = foundation_food
@@ -26,11 +26,11 @@ class IngredientFormatter(Formatter):
             print(err)
 
     
-    def _format_ingredient(self, raw_ingredient:str) -> dict:
+    def _format_ingredient(self, raw_ingredient:dict) -> dict:
         try:
-            new_ingredient = {}
-            self._set_manual_fields(raw_ingredient, new_ingredient)
-            self._set_parsed_fields(raw_ingredient, new_ingredient)
+            new_ingredient = {"group": "" if raw_ingredient["group"] == None else raw_ingredient["group"]}
+            self._set_manual_fields(raw_ingredient["text"], new_ingredient)
+            self._set_parsed_fields(raw_ingredient["text"], new_ingredient)
             return new_ingredient
         except Exception as err:
             print(err)
@@ -39,7 +39,11 @@ class IngredientFormatter(Formatter):
 
     def format(self, raw_data:list) -> list:
         try:
-            return [self._format_ingredient(ing) for ing in raw_data]
+            full_ingredients = []
+            for group in raw_data:
+                for i in group.ingredients:
+                    full_ingredients.append({"text": i, "group": group.purpose})
+            return [self._format_ingredient(ing) for ing in full_ingredients]
         except Exception as err:
             print(err)
             return []

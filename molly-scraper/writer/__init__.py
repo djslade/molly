@@ -1,3 +1,3 @@
-from .methods import body_to_str
+from .methods import new_body, body_to_str
 
-__all__ = ["body_to_str"]
+__all__ = ["new_body", "body_to_str"]

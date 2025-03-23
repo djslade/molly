@@ -1,10 +1,9 @@
-import recipes_pb2
-import recipes_pb2_grpc
+from protoc import RecipesServiceStub, CreateRecipeRequest
 import grpc
 
 class Invoker:
-    def __init__(self, stub:recipes_pb2_grpc.RecipesServiceStub):
-        self.__stub:recipes_pb2_grpc.RecipesServiceStub = stub
+    def __init__(self, stub:RecipesServiceStub):
+        self.__stub:RecipesServiceStub = stub
     
     def __handle_grpc_error(self, error:grpc.RpcError) -> str:
         match error.code():
@@ -22,7 +21,7 @@ class Invoker:
         return "Internal server error"
     
 
-    def create_recipe(self, req:recipes_pb2.CreateRecipeRequest) -> str:
+    def create_recipe(self, req:CreateRecipeRequest) -> str:
         try:
             self.__stub.CreateRecipe(req)
             return "OK"
