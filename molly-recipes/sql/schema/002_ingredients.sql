@@ -9,6 +9,7 @@ CREATE TABLE ingredients(
     quantity_string TEXT NOT NULL,
     unit TEXT NOT NULL,
     size TEXT NOT NULL,
+    ingredient_group TEXT NOT NULL,
     created TIMESTAMP NOT NULL
 );
 

@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { PubsubService } from './pubsub.service';
-import { PubsubController } from './pubsub.controller';
+import { RecipesModule } from 'src/recipes/recipes.module';
 
 @Module({
   imports: [
@@ -16,9 +16,9 @@ import { PubsubController } from './pubsub.controller';
         },
       },
     ]),
+    RecipesModule,
   ],
   providers: [PubsubService],
-  controllers: [PubsubController],
   exports: [ClientsModule, PubsubService],
 })
 export class PubsubModule {}

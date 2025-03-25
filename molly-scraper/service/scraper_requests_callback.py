@@ -15,11 +15,11 @@ def handle_scrape_request(channel:Channel, method:Basic.Deliver, _:BasicProperti
         recipe = new_recipe(recipe_url)
         res_code = invoker.create_recipe(recipe.grpc())
         rk = f"scraper.results.{res_code}"
-        publisher.publish(body=PublishBody(patter=rk, url=recipe_url))
+        publisher.publish(body=PublishBody(pattern=rk, url=recipe_url))
         acker.ack()
     except exceptions.BadRequestException:
         rk = "scraper.results.invalid"
-        publisher.publish(body=PublishBody(pattern=rk, url=recipe_url))
+        publisher.publish(body=PublishBody(pattern=rk))
         acker.discard()
     except exceptions.BadRecipeException:
         rk = "scraper.results.fail"

@@ -29,6 +29,7 @@ message CRIngredient {
     string quantity_string = 5;
     string unit = 6;
     string size = 7;
+    string ingredient_group = 8;
 }
 
 message CreateRecipeRequest {
@@ -75,7 +76,8 @@ message Ingredient {
     string quantity_string = 7;
     string unit = 8;
     string size = 9;
-    string created = 10;
+    string ingredient_group = 10;
+    string created = 11;
 }
 
 message Recipe {

@@ -23,7 +23,7 @@ class Ingredient(RecipeModel):
             "quantity_string": self.quantity_string,
             "unit": self.unit,
             "size": self.size,
-            "group": self.group
+            "ingredient_group": self.group
         }
         return data
     
@@ -37,5 +37,5 @@ class Ingredient(RecipeModel):
             quantity_string=self.quantity_string,
             unit=self.unit,
             size=self.size,
-            group=self.group
+            ingredient_group=self.group
         )

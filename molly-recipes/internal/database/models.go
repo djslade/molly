@@ -11,16 +11,17 @@ import (
 )
 
 type Ingredient struct {
-	ID             uuid.UUID
-	RecipeID       uuid.UUID
-	FullText       string
-	IsOptional     bool
-	Name           string
-	Quantity       float64
-	QuantityString string
-	Unit           string
-	Size           string
-	Created        time.Time
+	ID              uuid.UUID
+	RecipeID        uuid.UUID
+	FullText        string
+	IsOptional      bool
+	Name            string
+	Quantity        float64
+	QuantityString  string
+	Unit            string
+	Size            string
+	IngredientGroup string
+	Created         time.Time
 }
 
 type Instruction struct {

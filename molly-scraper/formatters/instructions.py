@@ -31,7 +31,7 @@ def to_instructions(raw_data:list[str]) -> list[Instruction]:
         timers = _set_timers(raw_instruction)
         new_instruction = Instruction(
             full_text=_clean_text(raw_instruction),
-            index=len(parsed_instructions),
+            index=len(parsed_instructions) + 1,
             has_timer=len(timers) > 0,
             timers=timers
         )

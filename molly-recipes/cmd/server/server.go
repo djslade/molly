@@ -15,10 +15,8 @@ func newServer(db *database.Queries, logger *log.Logger) *server {
 }
 
 func (srv *server) GetRecipeWithURL(ctx context.Context, req *pb.GetRecipeWithURLRequest) (*pb.RecipeResponse, error) {
-	srv.logger.Println(req)
 	recipeURL, err := normalizeUrl(req.GetRecipeUrl())
 	if err != nil {
-		srv.logger.Printf("at recipeURL: %v", err)
 		return nil, ErrInvalidRecipeURL
 	}
 
@@ -56,16 +54,17 @@ func (srv *server) GetRecipeWithURL(ctx context.Context, req *pb.GetRecipeWithUR
 	var ingredients []*pb.Ingredient
 	for _, ing := range foundIngredients {
 		ingredients = append(ingredients, &pb.Ingredient{
-			Id:             ing.ID.String(),
-			RecipeId:       ing.RecipeID.String(),
-			FullText:       ing.FullText,
-			IsOptional:     ing.IsOptional,
-			Name:           ing.Name,
-			Quantity:       float32(ing.Quantity),
-			QuantityString: ing.QuantityString,
-			Unit:           ing.Unit,
-			Size:           ing.Size,
-			Created:        ing.Created.String(),
+			Id:              ing.ID.String(),
+			RecipeId:        ing.RecipeID.String(),
+			FullText:        ing.FullText,
+			IsOptional:      ing.IsOptional,
+			Name:            ing.Name,
+			Quantity:        float32(ing.Quantity),
+			QuantityString:  ing.QuantityString,
+			Unit:            ing.Unit,
+			Size:            ing.Size,
+			IngredientGroup: ing.IngredientGroup,
+			Created:         ing.Created.String(),
 		})
 	}
 	recipe.Ingredients = ingredients
@@ -138,14 +137,15 @@ func (srv *server) CreateRecipe(ctx context.Context, req *pb.CreateRecipeRequest
 
 	for _, ingredient := range req.GetIngredients() {
 		_, err := srv.db.CreateIngredient(ctx, database.CreateIngredientParams{
-			RecipeID:       recipe.ID,
-			FullText:       ingredient.GetFullText(),
-			IsOptional:     ingredient.GetIsOptional(),
-			Name:           ingredient.GetName(),
-			Quantity:       float64(ingredient.GetQuantity()),
-			QuantityString: ingredient.GetQuantityString(),
-			Unit:           ingredient.GetUnit(),
-			Size:           ingredient.GetSize(),
+			RecipeID:        recipe.ID,
+			FullText:        ingredient.GetFullText(),
+			IsOptional:      ingredient.GetIsOptional(),
+			Name:            ingredient.GetName(),
+			Quantity:        float64(ingredient.GetQuantity()),
+			QuantityString:  ingredient.GetQuantityString(),
+			Unit:            ingredient.GetUnit(),
+			Size:            ingredient.GetSize(),
+			IngredientGroup: ingredient.GetIngredientGroup(),
 		})
 		if err != nil {
 			srv.logger.Printf("database error: %v", err.Error())

@@ -6,10 +6,8 @@ import {
 } from '@nestjs/websockets';
 import { Socket } from 'socket.io';
 import { RecipesService } from 'src/recipes/recipes.service';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { Cache } from 'cache-manager';
-import { Inject } from '@nestjs/common';
 import { PubsubService } from 'src/pubsub/pubsub.service';
+import { ScraperService } from './scraper.service';
 
 @WebSocketGateway()
 export class ScraperGateway
@@ -18,31 +16,38 @@ export class ScraperGateway
   constructor(
     private readonly recipesService: RecipesService,
     private readonly pubsubService: PubsubService,
-    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    private readonly scraperService: ScraperService,
   ) {}
-  clients: Socket[] = [];
 
   handleConnection(client: Socket) {
-    this.clients.push(client);
+    this.scraperService.onClientConnection(client);
   }
 
   handleDisconnect(client: Socket) {
-    this.clients = this.clients.filter((c) => c.id != client.id);
+    this.scraperService.onClientDisconnect(client);
   }
 
   @SubscribeMessage('scrape.request')
   async handleScrapeRequest(client: Socket, payload: { url: string }) {
-    const recipe = await this.cacheManager.get(`recipe-${payload.url}`);
+    const { url } = payload;
+    if (!url) {
+      const res = this.scraperService.newScraperResult(
+        'Please set a url field',
+      );
+      this.scraperService.sendErrorMessage(client, res);
+      return;
+    }
+    const recipe = await this.recipesService.checkCache(url);
     if (recipe !== null) {
-      client.emit('scrape', recipe);
+      this.scraperService.sendResult(url, recipe);
       return;
     }
     try {
-      const res = await this.recipesService.getRecipeWithURL(payload.url);
-      client.emit('scrape', res);
+      const res = await this.recipesService.getRecipeWithURL(url);
+      await this.recipesService.cacheRecipe(res, url);
+      this.scraperService.sendResult(url, res);
     } catch (err) {
-      client.emit('scrape', { status: 'bad' });
+      this.pubsubService.sendScraperRequest({ url });
     }
-    this.pubsubService.sendScraperRequest({ url: payload.url });
   }
 }

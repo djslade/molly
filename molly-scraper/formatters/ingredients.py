@@ -2,6 +2,7 @@ from recipe import Ingredient
 from ingredient_parser import parse_ingredient
 from .helpers import _is_optional
 from dataclasses import dataclass
+from fractions import Fraction
 
 @dataclass
 class _RawIngredient:
@@ -35,17 +36,14 @@ def _set_ingredient_name(parsed):
 
 def _set_ingredient_quantity_string(parsed) -> str:
     try:
-        return parsed.amount[0].quantity,
+        return str(parsed.amount[0].quantity)
     except:
         return ""
 
 
 def _set_ingredient_quantity(parsed) -> float:
     try:
-        quantity = _set_ingredient_quantity_string(parsed)
-        if quantity == "":
-            raise Exception
-        return float(quantity)
+        return float(parsed.amount[0].quantity)
     except:
         return 0
 
@@ -75,7 +73,7 @@ def _format_ingredient(raw_ingredient:_RawIngredient) -> Ingredient:
         quantity_string=_set_ingredient_quantity_string(parsed),
         unit=_set_ingredient_unit(parsed),
         size=_set_ingredient_size(parsed),
-        group=raw_ingredient.group
+        group="" if raw_ingredient.group == None else raw_ingredient.group
     )
     return ingredient
 
