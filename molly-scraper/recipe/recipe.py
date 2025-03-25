@@ -40,7 +40,7 @@ class Recipe(RecipeModel):
         return data
     
     
-    def grpc_create_recipe_request(self) -> CreateRecipeRequest:
+    def grpc(self) -> CreateRecipeRequest:
         request = CreateRecipeRequest(
             title=self.title,
             recipe_url=self.recipe_url,
@@ -53,7 +53,7 @@ class Recipe(RecipeModel):
             prep_time_minutes=self.prep_time_minutes,
             cook_time_minutes=self.cook_time_minutes,
             total_time_minutes=self.total_time_minutes,
-            ingredients=self.ingredients,
-            instructions=self.instructions,
+            ingredients=[ingredient.grpc() for ingredient in self.ingredients],
+            instructions=[instruction.grpc() for instruction in self.instructions],
         )
         return request

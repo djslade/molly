@@ -7,7 +7,8 @@ INSERT INTO recipes(
     cuisine, 
     cooking_method, 
     category, 
-    image_url, 
+    image_url,
+    yields,
     prep_time_minutes, 
     cook_time_minutes, 
     total_time_minutes,
@@ -24,6 +25,7 @@ INSERT INTO recipes(
         $8,
         $9,
         $10,
+        $11,
         NOW()
     ) RETURNING *;
 

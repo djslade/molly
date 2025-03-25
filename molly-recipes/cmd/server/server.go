@@ -18,6 +18,7 @@ func (srv *server) GetRecipeWithURL(ctx context.Context, req *pb.GetRecipeWithUR
 	srv.logger.Println(req)
 	recipeURL, err := normalizeUrl(req.GetRecipeUrl())
 	if err != nil {
+		srv.logger.Printf("at recipeURL: %v", err)
 		return nil, ErrInvalidRecipeURL
 	}
 
@@ -39,6 +40,7 @@ func (srv *server) GetRecipeWithURL(ctx context.Context, req *pb.GetRecipeWithUR
 		CookingMethod:    foundRecipe.CookingMethod,
 		Category:         foundRecipe.Category,
 		ImageUrl:         foundRecipe.ImageUrl,
+		Yields:           foundRecipe.Yields,
 		PrepTimeMinutes:  foundRecipe.PrepTimeMinutes,
 		CookTimeMinutes:  foundRecipe.CookTimeMinutes,
 		TotalTimeMinutes: foundRecipe.TotalTimeMinutes,
@@ -112,6 +114,7 @@ func (srv *server) GetRecipeWithURL(ctx context.Context, req *pb.GetRecipeWithUR
 func (srv *server) CreateRecipe(ctx context.Context, req *pb.CreateRecipeRequest) (*pb.CreateRecipeResponse, error) {
 	recipeURL, err := normalizeUrl(req.GetRecipeUrl())
 	if err != nil {
+		srv.logger.Printf("at recipeURL: %v", err)
 		return nil, ErrInvalidRecipeURL
 	}
 
@@ -123,6 +126,7 @@ func (srv *server) CreateRecipe(ctx context.Context, req *pb.CreateRecipeRequest
 		Cuisine:          req.GetCuisine(),
 		Category:         req.GetCategory(),
 		ImageUrl:         req.GetImageUrl(),
+		Yields:           req.GetYields(),
 		PrepTimeMinutes:  req.GetPrepTimeMinutes(),
 		CookTimeMinutes:  req.GetCookTimeMinutes(),
 		TotalTimeMinutes: req.GetTotalTimeMinutes(),

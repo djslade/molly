@@ -12,6 +12,7 @@ interface IRecipesGRPCService {
     cooking_method: string;
     category: string;
     image_url: string;
+    yields: string;
     prep_time_minutes: number;
     cook_time_minutes: number;
     total_time_minutes: number;

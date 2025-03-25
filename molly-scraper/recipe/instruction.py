@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from .recipe_model import RecipeModel
 from .timer import Timer
+from protoc import CRInstruction
 
 @dataclass
 class Instruction(RecipeModel):
@@ -18,3 +19,12 @@ class Instruction(RecipeModel):
             "timers": [timer.json() for timer in self.timers]
         }
         return data
+    
+
+    def grpc(self) -> CRInstruction:
+        return CRInstruction(
+            full_text=self.full_text,
+            index=self.index,
+            has_timer=self.has_timer,
+            timers=[timer.grpc() for timer in self.timers]
+        )

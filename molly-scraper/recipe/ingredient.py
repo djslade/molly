@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from .recipe_model import RecipeModel
+from protoc import CRIngredient
 
 @dataclass
 class Ingredient(RecipeModel):
@@ -25,3 +26,16 @@ class Ingredient(RecipeModel):
             "group": self.group
         }
         return data
+    
+
+    def grpc(self) -> CRIngredient:
+        return CRIngredient(
+            full_text=self.full_text,
+            is_optional=self.is_optional,
+            name=self.name,
+            quantity=self.quantity,
+            quantity_string=self.quantity_string,
+            unit=self.unit,
+            size=self.size,
+            group=self.group
+        )

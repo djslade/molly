@@ -18,7 +18,8 @@ INSERT INTO recipes(
     cuisine, 
     cooking_method, 
     category, 
-    image_url, 
+    image_url,
+    yields,
     prep_time_minutes, 
     cook_time_minutes, 
     total_time_minutes,
@@ -35,8 +36,9 @@ INSERT INTO recipes(
         $8,
         $9,
         $10,
+        $11,
         NOW()
-    ) RETURNING id, recipe_url, title, description, cuisine, cooking_method, category, image_url, prep_time_minutes, cook_time_minutes, total_time_minutes, created
+    ) RETURNING id, recipe_url, title, description, cuisine, cooking_method, category, image_url, yields, prep_time_minutes, cook_time_minutes, total_time_minutes, created
 `
 
 type CreateRecipeParams struct {
@@ -47,6 +49,7 @@ type CreateRecipeParams struct {
 	CookingMethod    string
 	Category         string
 	ImageUrl         string
+	Yields           string
 	PrepTimeMinutes  int32
 	CookTimeMinutes  int32
 	TotalTimeMinutes int32
@@ -61,6 +64,7 @@ func (q *Queries) CreateRecipe(ctx context.Context, arg CreateRecipeParams) (Rec
 		arg.CookingMethod,
 		arg.Category,
 		arg.ImageUrl,
+		arg.Yields,
 		arg.PrepTimeMinutes,
 		arg.CookTimeMinutes,
 		arg.TotalTimeMinutes,
@@ -75,6 +79,7 @@ func (q *Queries) CreateRecipe(ctx context.Context, arg CreateRecipeParams) (Rec
 		&i.CookingMethod,
 		&i.Category,
 		&i.ImageUrl,
+		&i.Yields,
 		&i.PrepTimeMinutes,
 		&i.CookTimeMinutes,
 		&i.TotalTimeMinutes,
@@ -84,7 +89,7 @@ func (q *Queries) CreateRecipe(ctx context.Context, arg CreateRecipeParams) (Rec
 }
 
 const getRecipeByURL = `-- name: GetRecipeByURL :one
-SELECT id, recipe_url, title, description, cuisine, cooking_method, category, image_url, prep_time_minutes, cook_time_minutes, total_time_minutes, created FROM recipes WHERE recipe_url=$1
+SELECT id, recipe_url, title, description, cuisine, cooking_method, category, image_url, yields, prep_time_minutes, cook_time_minutes, total_time_minutes, created FROM recipes WHERE recipe_url=$1
 `
 
 func (q *Queries) GetRecipeByURL(ctx context.Context, recipeUrl string) (Recipe, error) {
@@ -99,6 +104,7 @@ func (q *Queries) GetRecipeByURL(ctx context.Context, recipeUrl string) (Recipe,
 		&i.CookingMethod,
 		&i.Category,
 		&i.ImageUrl,
+		&i.Yields,
 		&i.PrepTimeMinutes,
 		&i.CookTimeMinutes,
 		&i.TotalTimeMinutes,

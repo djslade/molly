@@ -41,6 +41,7 @@ type Recipe struct {
 	CookingMethod    string
 	Category         string
 	ImageUrl         string
+	Yields           string
 	PrepTimeMinutes  int32
 	CookTimeMinutes  int32
 	TotalTimeMinutes int32
