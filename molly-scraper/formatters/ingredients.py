@@ -20,55 +20,49 @@ def _get_raw_ingredients(raw_data:list) -> list[_RawIngredient]:
     return full_ingredients
 
 
-def _set_field(value, fallback, fb_condition):
-    return fallback if fb_condition else value
-
-
 def _set_ingredient_name(parsed):
-    foundation_food = _set_field(
-        value=parsed.foundation_foods[0].text,
-        fallback="",
-        fb_condition=len(parsed.foundation_foods) == 0
-    )
-    if foundation_food != "":
+    try:
+        foundation_food = parsed.foundation_foods[0].text
+        if foundation_food == "":
+            raise Exception
         return foundation_food
-    return _set_field(
-        value=parsed.name[0].text,
-        fallback="",
-        fb_condition=len(parsed.name) == 0
-    )
+    except:
+        try:
+            return parsed.name[0].text
+        except:
+            return ""
 
 
 def _set_ingredient_quantity_string(parsed) -> str:
-    quantity = _set_field(
-        value=parsed.amount[0].quantity,
-        fallback="",
-        fb_condition=len(parsed.amount) == 0
-    )
-    return quantity
+    try:
+        return parsed.amount[0].quantity,
+    except:
+        return ""
 
 
 def _set_ingredient_quantity(parsed) -> float:
-    quantity = _set_ingredient_quantity_string(parsed)
-    return 0 if quantity == "" else float(quantity)
+    try:
+        quantity = _set_ingredient_quantity_string(parsed)
+        if quantity == "":
+            raise Exception
+        return float(quantity)
+    except:
+        return 0
 
 
 def _set_ingredient_unit(parsed) -> str:
-    unit = _set_field(
-        value=parsed.amount[0].unit,
-        fallback="",
-        fb_condition=len(parsed.amount) == 0
-    )
-    return unit
+    try:
+        unit = parsed.amount[0].unit
+        return str(unit)
+    except:
+        return ""
 
 
 def _set_ingredient_size(parsed) -> str:
-    size = _set_field(
-        value=parsed.size.text,
-        fallback="",
-        fb_condition=parsed.size == None
-    )
-    return size
+    try:
+        return parsed.size.text
+    except:
+        return ""
 
 
 def _format_ingredient(raw_ingredient:_RawIngredient) -> Ingredient:

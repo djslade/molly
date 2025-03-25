@@ -8,11 +8,8 @@ INSERT INTO recipes(
     category, 
     image_url, 
     prep_time_minutes, 
-    prep_time_string, 
     cook_time_minutes, 
-    cook_time_string,
     total_time_minutes,
-    total_time_string,
     created
     ) VALUES (
         GEN_RANDOM_UUID(),
@@ -25,9 +22,6 @@ INSERT INTO recipes(
         $7,
         $8,
         $9,
-        $10,
-        $11,
-        $12,
         NOW()
     ) RETURNING *;
 

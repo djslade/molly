@@ -1,7 +1,7 @@
 from .publisher import Publisher
 from .acker import Acker
 from .broker import Broker
-from .methods import handle_scrape_request
 from .subscriber import Subscriber
+from .publish_body import PublishBody
 
-__all__ = ["Publisher", "Acker", "Broker", "handle_scrape_request", "Subscriber"]
+__all__ = ["Publisher", "Acker", "Broker", "Subscriber", "PublishBody"]

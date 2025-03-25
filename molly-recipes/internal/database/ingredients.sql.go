@@ -12,19 +12,20 @@ import (
 )
 
 const createIngredient = `-- name: CreateIngredient :one
-INSERT INTO ingredients(id, recipe_id, full_text, is_optional, name, quantity, unit, size, created)
-VALUES (GEN_RANDOM_UUID(), $1, $2, $3, $4, $5, $6, $7, NOW())
-RETURNING id, recipe_id, full_text, is_optional, name, quantity, unit, size, created
+INSERT INTO ingredients(id, recipe_id, full_text, is_optional, name, quantity, quantity_string, unit, size, created)
+VALUES (GEN_RANDOM_UUID(), $1, $2, $3, $4, $5, $6, $7, $8, NOW())
+RETURNING id, recipe_id, full_text, is_optional, name, quantity, quantity_string, unit, size, created
 `
 
 type CreateIngredientParams struct {
-	RecipeID   uuid.UUID
-	FullText   string
-	IsOptional bool
-	Name       string
-	Quantity   string
-	Unit       string
-	Size       string
+	RecipeID       uuid.UUID
+	FullText       string
+	IsOptional     bool
+	Name           string
+	Quantity       float64
+	QuantityString string
+	Unit           string
+	Size           string
 }
 
 func (q *Queries) CreateIngredient(ctx context.Context, arg CreateIngredientParams) (Ingredient, error) {
@@ -34,6 +35,7 @@ func (q *Queries) CreateIngredient(ctx context.Context, arg CreateIngredientPara
 		arg.IsOptional,
 		arg.Name,
 		arg.Quantity,
+		arg.QuantityString,
 		arg.Unit,
 		arg.Size,
 	)
@@ -45,6 +47,7 @@ func (q *Queries) CreateIngredient(ctx context.Context, arg CreateIngredientPara
 		&i.IsOptional,
 		&i.Name,
 		&i.Quantity,
+		&i.QuantityString,
 		&i.Unit,
 		&i.Size,
 		&i.Created,
@@ -53,7 +56,7 @@ func (q *Queries) CreateIngredient(ctx context.Context, arg CreateIngredientPara
 }
 
 const getIngredientsByRecipeID = `-- name: GetIngredientsByRecipeID :many
-SELECT id, recipe_id, full_text, is_optional, name, quantity, unit, size, created FROM ingredients WHERE recipe_id=$1
+SELECT id, recipe_id, full_text, is_optional, name, quantity, quantity_string, unit, size, created FROM ingredients WHERE recipe_id=$1
 `
 
 func (q *Queries) GetIngredientsByRecipeID(ctx context.Context, recipeID uuid.UUID) ([]Ingredient, error) {
@@ -72,6 +75,7 @@ func (q *Queries) GetIngredientsByRecipeID(ctx context.Context, recipeID uuid.UU
 			&i.IsOptional,
 			&i.Name,
 			&i.Quantity,
+			&i.QuantityString,
 			&i.Unit,
 			&i.Size,
 			&i.Created,

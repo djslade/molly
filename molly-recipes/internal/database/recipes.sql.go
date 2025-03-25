@@ -19,11 +19,8 @@ INSERT INTO recipes(
     category, 
     image_url, 
     prep_time_minutes, 
-    prep_time_string, 
     cook_time_minutes, 
-    cook_time_string,
     total_time_minutes,
-    total_time_string,
     created
     ) VALUES (
         GEN_RANDOM_UUID(),
@@ -36,11 +33,8 @@ INSERT INTO recipes(
         $7,
         $8,
         $9,
-        $10,
-        $11,
-        $12,
         NOW()
-    ) RETURNING id, recipe_url, title, description, cooking_method, category, image_url, prep_time_minutes, prep_time_string, cook_time_minutes, cook_time_string, total_time_minutes, total_time_string, created
+    ) RETURNING id, recipe_url, title, description, cooking_method, category, image_url, prep_time_minutes, cook_time_minutes, total_time_minutes, created
 `
 
 type CreateRecipeParams struct {
@@ -51,11 +45,8 @@ type CreateRecipeParams struct {
 	Category         string
 	ImageUrl         string
 	PrepTimeMinutes  int32
-	PrepTimeString   string
 	CookTimeMinutes  int32
-	CookTimeString   string
 	TotalTimeMinutes int32
-	TotalTimeString  string
 }
 
 func (q *Queries) CreateRecipe(ctx context.Context, arg CreateRecipeParams) (Recipe, error) {
@@ -67,11 +58,8 @@ func (q *Queries) CreateRecipe(ctx context.Context, arg CreateRecipeParams) (Rec
 		arg.Category,
 		arg.ImageUrl,
 		arg.PrepTimeMinutes,
-		arg.PrepTimeString,
 		arg.CookTimeMinutes,
-		arg.CookTimeString,
 		arg.TotalTimeMinutes,
-		arg.TotalTimeString,
 	)
 	var i Recipe
 	err := row.Scan(
@@ -83,18 +71,15 @@ func (q *Queries) CreateRecipe(ctx context.Context, arg CreateRecipeParams) (Rec
 		&i.Category,
 		&i.ImageUrl,
 		&i.PrepTimeMinutes,
-		&i.PrepTimeString,
 		&i.CookTimeMinutes,
-		&i.CookTimeString,
 		&i.TotalTimeMinutes,
-		&i.TotalTimeString,
 		&i.Created,
 	)
 	return i, err
 }
 
 const getRecipeByURL = `-- name: GetRecipeByURL :one
-SELECT id, recipe_url, title, description, cooking_method, category, image_url, prep_time_minutes, prep_time_string, cook_time_minutes, cook_time_string, total_time_minutes, total_time_string, created FROM recipes WHERE recipe_url=$1
+SELECT id, recipe_url, title, description, cooking_method, category, image_url, prep_time_minutes, cook_time_minutes, total_time_minutes, created FROM recipes WHERE recipe_url=$1
 `
 
 func (q *Queries) GetRecipeByURL(ctx context.Context, recipeUrl string) (Recipe, error) {
@@ -109,11 +94,8 @@ func (q *Queries) GetRecipeByURL(ctx context.Context, recipeUrl string) (Recipe,
 		&i.Category,
 		&i.ImageUrl,
 		&i.PrepTimeMinutes,
-		&i.PrepTimeString,
 		&i.CookTimeMinutes,
-		&i.CookTimeString,
 		&i.TotalTimeMinutes,
-		&i.TotalTimeString,
 		&i.Created,
 	)
 	return i, err

@@ -8,11 +8,8 @@ CREATE TABLE recipes(
     category TEXT NOT NULL,
     image_url TEXT NOT NULL,
     prep_time_minutes INT NOT NULL,
-    prep_time_string TEXT NOT NULL,
     cook_time_minutes INT NOT NULL,
-    cook_time_string TEXT NOT NULL,
     total_time_minutes INT NOT NULL,
-    total_time_string TEXT NOT NULL,
     created TIMESTAMP NOT NULL
 );
 

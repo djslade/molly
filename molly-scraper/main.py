@@ -1,8 +1,10 @@
-from pubsub import Broker, Subscriber, handle_scrape_request
+from pubsub import Broker, Subscriber
+from service import handle_scrape_request
+import logging
 
 def main():
-    print("Connection to message broker established")
     broker = Broker()
+    print("Connection to message broker established")
     subscriber = Subscriber(broker.get_channel())
     subscriber.declare_channel(queue_name="scraper.requests")
     subscriber.declare_channel(queue_name="scraper.results")
@@ -10,7 +12,10 @@ def main():
     subscriber.consume(queue_name="scraper.requests", callback=handle_scrape_request)
         
 
-
-
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        logging.warning("Detected keyboard interruption signal")
+    finally:
+        print("Shutting down...")

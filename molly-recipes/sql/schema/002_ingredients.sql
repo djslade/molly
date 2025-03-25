@@ -5,7 +5,8 @@ CREATE TABLE ingredients(
     full_text TEXT NOT NULL,
     is_optional BOOLEAN NOT NULL,
     name TEXT NOT NULL,
-    quantity TEXT NOT NULL,
+    quantity FLOAT NOT NULL,
+    quantity_string TEXT NOT NULL,
     unit TEXT NOT NULL,
     size TEXT NOT NULL,
     created TIMESTAMP NOT NULL

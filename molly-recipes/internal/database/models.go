@@ -11,15 +11,16 @@ import (
 )
 
 type Ingredient struct {
-	ID         uuid.UUID
-	RecipeID   uuid.UUID
-	FullText   string
-	IsOptional bool
-	Name       string
-	Quantity   string
-	Unit       string
-	Size       string
-	Created    time.Time
+	ID             uuid.UUID
+	RecipeID       uuid.UUID
+	FullText       string
+	IsOptional     bool
+	Name           string
+	Quantity       float64
+	QuantityString string
+	Unit           string
+	Size           string
+	Created        time.Time
 }
 
 type Instruction struct {
@@ -27,6 +28,7 @@ type Instruction struct {
 	RecipeID uuid.UUID
 	Index    int32
 	FullText string
+	HasTimer bool
 	Created  time.Time
 }
 
@@ -39,11 +41,8 @@ type Recipe struct {
 	Category         string
 	ImageUrl         string
 	PrepTimeMinutes  int32
-	PrepTimeString   string
 	CookTimeMinutes  int32
-	CookTimeString   string
 	TotalTimeMinutes int32
-	TotalTimeString  string
 	Created          time.Time
 }
 

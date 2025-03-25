@@ -1,5 +1,5 @@
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
-import { ClientGrpc, GrpcMethod } from '@nestjs/microservices';
+import { ClientGrpc } from '@nestjs/microservices';
 import { Observable, lastValueFrom } from 'rxjs';
 
 interface IRecipesGRPCService {
@@ -12,22 +12,21 @@ interface IRecipesGRPCService {
     category: string;
     image_url: string;
     prep_time_minutes: number;
-    prep_time: string;
     cook_time_minutes: number;
-    cook_time: string;
     total_time_minutes: number;
-    total_time: string;
     ingredients: {
       full_text: string;
       is_optional: boolean;
       name: string;
-      quantity: string;
+      quantity: number;
+      quantity_string: string;
       unit: string;
       size: string;
     }[];
     instructions: {
       index: number;
       full_text: string;
+      has_timer: boolean;
       timers: {
         value: number;
         unit: string;

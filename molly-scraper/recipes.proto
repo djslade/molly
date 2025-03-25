@@ -17,16 +17,18 @@ message CRTimer {
 message CRInstruction {
     int32 index = 1;
     string full_text = 2;
-    repeated CRTimer timers = 3;
+    bool has_timer = 3;
+    repeated CRTimer timers = 4;
 }
 
 message CRIngredient {
     string full_text = 1;
     bool is_optional = 2;
     string name = 3;
-    string quantity = 4;
-    string unit = 5;
-    string size = 6;
+    float quantity = 4;
+    string quantity_string = 5;
+    string unit = 6;
+    string size = 7;
 }
 
 message CreateRecipeRequest {
@@ -37,13 +39,10 @@ message CreateRecipeRequest {
     string category = 5;
     string image_url = 6;
     int32 prep_time_minutes = 7;
-    string prep_time = 8;
-    int32 cook_time_minutes = 9;
-    string cook_time = 10;
-    int32 total_time_minutes = 11;
-    string total_time = 12;
-    repeated CRIngredient ingredients = 13;
-    repeated CRInstruction instructions = 14;
+    int32 cook_time_minutes = 8;
+    int32 total_time_minutes = 9;
+    repeated CRIngredient ingredients = 10;
+    repeated CRInstruction instructions = 11;
 }
 
 message Timer {
@@ -59,8 +58,9 @@ message Instruction {
     string recipe_id = 2;
     int32 index = 3;
     string full_text = 4;
-    repeated Timer timers = 5;
-    string created = 6;
+    bool has_timer = 5;
+    repeated Timer timers = 6;
+    string created = 7;
 }
 
 message Ingredient {
@@ -69,10 +69,11 @@ message Ingredient {
     string full_text = 3;
     bool is_optional = 4;
     string name = 5;
-    string quantity = 6;
-    string unit = 7;
-    string size = 8;
-    string created = 9;
+    float quantity = 6;
+    string quantity_string = 7;
+    string unit = 8;
+    string size = 9;
+    string created = 10;
 }
 
 message Recipe {
@@ -84,14 +85,11 @@ message Recipe {
     string category = 6;
     string image_url = 7;
     int32 prep_time_minutes = 8;
-    string prep_time = 9;
-    int32 cook_time_minutes = 10;
-    string cook_time = 11;
-    int32 total_time_minutes = 12;
-    string total_time = 13;
-    repeated Ingredient ingredients = 14;
-    repeated Instruction instructions = 15;
-    string created = 16;
+    int32 cook_time_minutes = 9;
+    int32 total_time_minutes = 10;
+    repeated Ingredient ingredients = 11;
+    repeated Instruction instructions = 12;
+    string created = 13;
 }
 
 message GetRecipeWithURLRequest {

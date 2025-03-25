@@ -12,32 +12,39 @@ import (
 )
 
 const createInstruction = `-- name: CreateInstruction :one
-INSERT INTO instructions(id, recipe_id, index, full_text, created)
-VALUES (GEN_RANDOM_UUID(), $1, $2, $3, NOW())
-RETURNING id, recipe_id, index, full_text, created
+INSERT INTO instructions(id, recipe_id, index, full_text, has_timer, created)
+VALUES (GEN_RANDOM_UUID(), $1, $2, $3, $4, NOW())
+RETURNING id, recipe_id, index, full_text, has_timer, created
 `
 
 type CreateInstructionParams struct {
 	RecipeID uuid.UUID
 	Index    int32
 	FullText string
+	HasTimer bool
 }
 
 func (q *Queries) CreateInstruction(ctx context.Context, arg CreateInstructionParams) (Instruction, error) {
-	row := q.db.QueryRowContext(ctx, createInstruction, arg.RecipeID, arg.Index, arg.FullText)
+	row := q.db.QueryRowContext(ctx, createInstruction,
+		arg.RecipeID,
+		arg.Index,
+		arg.FullText,
+		arg.HasTimer,
+	)
 	var i Instruction
 	err := row.Scan(
 		&i.ID,
 		&i.RecipeID,
 		&i.Index,
 		&i.FullText,
+		&i.HasTimer,
 		&i.Created,
 	)
 	return i, err
 }
 
 const getInstructionsByRecipeID = `-- name: GetInstructionsByRecipeID :many
-SELECT id, recipe_id, index, full_text, created FROM instructions WHERE recipe_id=$1
+SELECT id, recipe_id, index, full_text, has_timer, created FROM instructions WHERE recipe_id=$1
 `
 
 func (q *Queries) GetInstructionsByRecipeID(ctx context.Context, recipeID uuid.UUID) ([]Instruction, error) {
@@ -54,6 +61,7 @@ func (q *Queries) GetInstructionsByRecipeID(ctx context.Context, recipeID uuid.U
 			&i.RecipeID,
 			&i.Index,
 			&i.FullText,
+			&i.HasTimer,
 			&i.Created,
 		); err != nil {
 			return nil, err

@@ -10,7 +10,6 @@ def _get_timers(text:str) -> list:
             matches.extend(sentence_matches)
         return list(filter(lambda x: x[0] != "0", matches))
     except Exception as err:
-        print(err)
         return []
 
 

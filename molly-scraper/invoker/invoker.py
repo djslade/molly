@@ -10,20 +10,20 @@ class Invoker:
             case grpc.StatusCode.INVALID_ARGUMENT:
                 print("An invalid argument was supplied to the rpc call. This might indicate a problem with the scraper service")
                 print(error.details())
-                return "Bad request"
+                return "internal"
             case grpc.StatusCode.INTERNAL:
                 print(error.details())
-                return "Internal server error"
+                return "internal"
             case grpc.StatusCode.NOT_FOUND:
-                return "Not found"
+                return "notfound"
             case grpc.StatusCode.UNAVAILABLE:
-                return "Recipe server unavailable"
-        return "Internal server error"
+                return "unavailable"
+        return "Internal"
     
 
     def create_recipe(self, req:CreateRecipeRequest) -> str:
         try:
             self.__stub.CreateRecipe(req)
-            return "OK"
+            return "ok"
         except grpc.RpcError as err:
             return self.__handle_grpc_error(err)

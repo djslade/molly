@@ -4,7 +4,10 @@ from recipe import Instruction, Timer
 
 def _set_timers(instruction:str) -> list[Timer]:
     timers:list[Timer] = []
-    for timer in _get_timers(instruction):
+    parsed_timers = _get_timers(instruction)
+    if len(parsed_timers) == 0:
+        return timers
+    for timer in parsed_timers:
         new_timer = Timer(
             value=int(timer[0]),
             unit=timer[1]

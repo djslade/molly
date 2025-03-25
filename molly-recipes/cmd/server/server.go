@@ -39,11 +39,8 @@ func (srv *server) GetRecipeWithURL(ctx context.Context, req *pb.GetRecipeWithUR
 		Category:         foundRecipe.Category,
 		ImageUrl:         foundRecipe.ImageUrl,
 		PrepTimeMinutes:  foundRecipe.PrepTimeMinutes,
-		PrepTime:         foundRecipe.PrepTimeString,
 		CookTimeMinutes:  foundRecipe.CookTimeMinutes,
-		CookTime:         foundRecipe.CookTimeString,
 		TotalTimeMinutes: foundRecipe.TotalTimeMinutes,
-		TotalTime:        foundRecipe.TotalTimeString,
 		Created:          foundRecipe.Created.String(),
 	}
 
@@ -56,15 +53,16 @@ func (srv *server) GetRecipeWithURL(ctx context.Context, req *pb.GetRecipeWithUR
 	var ingredients []*pb.Ingredient
 	for _, ing := range foundIngredients {
 		ingredients = append(ingredients, &pb.Ingredient{
-			Id:         ing.ID.String(),
-			RecipeId:   ing.RecipeID.String(),
-			FullText:   ing.FullText,
-			IsOptional: ing.IsOptional,
-			Name:       ing.Name,
-			Quantity:   ing.Quantity,
-			Unit:       ing.Unit,
-			Size:       ing.Size,
-			Created:    ing.Created.String(),
+			Id:             ing.ID.String(),
+			RecipeId:       ing.RecipeID.String(),
+			FullText:       ing.FullText,
+			IsOptional:     ing.IsOptional,
+			Name:           ing.Name,
+			Quantity:       float32(ing.Quantity),
+			QuantityString: ing.QuantityString,
+			Unit:           ing.Unit,
+			Size:           ing.Size,
+			Created:        ing.Created.String(),
 		})
 	}
 	recipe.Ingredients = ingredients
@@ -97,6 +95,7 @@ func (srv *server) GetRecipeWithURL(ctx context.Context, req *pb.GetRecipeWithUR
 			RecipeId: inst.RecipeID.String(),
 			Index:    inst.Index,
 			FullText: inst.FullText,
+			HasTimer: inst.HasTimer,
 			Timers:   timers,
 			Created:  inst.Created.String(),
 		})
@@ -123,11 +122,8 @@ func (srv *server) CreateRecipe(ctx context.Context, req *pb.CreateRecipeRequest
 		Category:         req.GetCategory(),
 		ImageUrl:         req.GetImageUrl(),
 		PrepTimeMinutes:  req.GetPrepTimeMinutes(),
-		PrepTimeString:   req.GetPrepTime(),
 		CookTimeMinutes:  req.GetCookTimeMinutes(),
-		CookTimeString:   req.GetCookTime(),
 		TotalTimeMinutes: req.GetTotalTimeMinutes(),
-		TotalTimeString:  req.GetTotalTime(),
 	})
 	if err != nil {
 		srv.logger.Printf("database error: %v", err.Error())
@@ -136,13 +132,14 @@ func (srv *server) CreateRecipe(ctx context.Context, req *pb.CreateRecipeRequest
 
 	for _, ingredient := range req.GetIngredients() {
 		_, err := srv.db.CreateIngredient(ctx, database.CreateIngredientParams{
-			RecipeID:   recipe.ID,
-			FullText:   ingredient.GetFullText(),
-			IsOptional: ingredient.GetIsOptional(),
-			Name:       ingredient.GetName(),
-			Quantity:   ingredient.GetQuantity(),
-			Unit:       ingredient.GetUnit(),
-			Size:       ingredient.GetSize(),
+			RecipeID:       recipe.ID,
+			FullText:       ingredient.GetFullText(),
+			IsOptional:     ingredient.GetIsOptional(),
+			Name:           ingredient.GetName(),
+			Quantity:       float64(ingredient.GetQuantity()),
+			QuantityString: ingredient.GetQuantityString(),
+			Unit:           ingredient.GetUnit(),
+			Size:           ingredient.GetSize(),
 		})
 		if err != nil {
 			srv.logger.Printf("database error: %v", err.Error())
@@ -153,8 +150,9 @@ func (srv *server) CreateRecipe(ctx context.Context, req *pb.CreateRecipeRequest
 	for _, instruction := range req.GetInstructions() {
 		newInstruction, err := srv.db.CreateInstruction(ctx, database.CreateInstructionParams{
 			RecipeID: recipe.ID,
-			Index:    instruction.Index,
-			FullText: instruction.FullText,
+			Index:    instruction.GetIndex(),
+			FullText: instruction.GetFullText(),
+			HasTimer: instruction.GetHasTimer(),
 		})
 		if err != nil {
 			srv.logger.Printf("database error: %v", err.Error())
@@ -164,8 +162,8 @@ func (srv *server) CreateRecipe(ctx context.Context, req *pb.CreateRecipeRequest
 		for _, timer := range instruction.GetTimers() {
 			_, err := srv.db.CreateTimer(ctx, database.CreateTimerParams{
 				InstructionID: newInstruction.ID,
-				Unit:          timer.Unit,
-				Value:         timer.Value,
+				Unit:          timer.GetUnit(),
+				Value:         timer.GetValue(),
 			})
 			if err != nil {
 				srv.logger.Printf("database error: %v", err.Error())

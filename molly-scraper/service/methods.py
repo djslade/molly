@@ -1,7 +1,11 @@
-from .recipe import Recipe
-from .exceptions import BadRecipeException
+from recipe import Recipe
 from scraper import Scraper
 from formatters import to_instructions, to_ingredients
+from invoker import Invoker
+import grpc
+from protoc import RecipesServiceStub
+import json
+import exceptions
 
 
 def _set_optional_field(fn, fallback):
@@ -32,5 +36,24 @@ def new_recipe(url:str) -> Recipe:
             instructions=instructions
         )
         return recipe
+    except Exception as err:
+        print(err)
+        raise exceptions.BadRecipeException
+
+
+def new_invoker() -> Invoker:
+    grpc_channel = grpc.insecure_channel("localhost:8080")
+    stub = RecipesServiceStub(grpc_channel)
+    invoker = Invoker(stub=stub)
+    return invoker
+
+
+def get_recipe_url(body: bytes) -> str:
+    try:
+        json_body = json.loads(body)
+        recipe_url = json_body["data"]["url"]
+        if recipe_url == "" or recipe_url == None:
+            raise Exception
+        return recipe_url
     except:
-        raise BadRecipeException
+        raise exceptions.BadRequestException

@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\rrecipes.proto\x12\x07recipes\"&\n\x07\x43RTimer\x12\r\n\x05value\x18\x01 \x01(\x05\x12\x0c\n\x04unit\x18\x02 \x01(\t\"S\n\rCRInstruction\x12\r\n\x05index\x18\x01 \x01(\x05\x12\x11\n\tfull_text\x18\x02 \x01(\t\x12 \n\x06timers\x18\x03 \x03(\x0b\x32\x10.recipes.CRTimer\"r\n\x0c\x43RIngredient\x12\x11\n\tfull_text\x18\x01 \x01(\t\x12\x13\n\x0bis_optional\x18\x02 \x01(\x08\x12\x0c\n\x04name\x18\x03 \x01(\t\x12\x10\n\x08quantity\x18\x04 \x01(\t\x12\x0c\n\x04unit\x18\x05 \x01(\t\x12\x0c\n\x04size\x18\x06 \x01(\t\"\xf0\x02\n\x13\x43reateRecipeRequest\x12\x12\n\nrecipe_url\x18\x01 \x01(\t\x12\r\n\x05title\x18\x02 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x03 \x01(\t\x12\x16\n\x0e\x63ooking_method\x18\x04 \x01(\t\x12\x10\n\x08\x63\x61tegory\x18\x05 \x01(\t\x12\x11\n\timage_url\x18\x06 \x01(\t\x12\x19\n\x11prep_time_minutes\x18\x07 \x01(\x05\x12\x11\n\tprep_time\x18\x08 \x01(\t\x12\x19\n\x11\x63ook_time_minutes\x18\t \x01(\x05\x12\x11\n\tcook_time\x18\n \x01(\t\x12\x1a\n\x12total_time_minutes\x18\x0b \x01(\x05\x12\x12\n\ntotal_time\x18\x0c \x01(\t\x12*\n\x0bingredients\x18\r \x03(\x0b\x32\x15.recipes.CRIngredient\x12,\n\x0cinstructions\x18\x0e \x03(\x0b\x32\x16.recipes.CRInstruction\"Y\n\x05Timer\x12\n\n\x02id\x18\x01 \x01(\t\x12\x16\n\x0einstruction_id\x18\x02 \x01(\t\x12\r\n\x05value\x18\x03 \x01(\x05\x12\x0c\n\x04unit\x18\x04 \x01(\t\x12\x0f\n\x07\x63reated\x18\x05 \x01(\t\"\x7f\n\x0bInstruction\x12\n\n\x02id\x18\x01 \x01(\t\x12\x11\n\trecipe_id\x18\x02 \x01(\t\x12\r\n\x05index\x18\x03 \x01(\x05\x12\x11\n\tfull_text\x18\x04 \x01(\t\x12\x1e\n\x06timers\x18\x05 \x03(\x0b\x32\x0e.recipes.Timer\x12\x0f\n\x07\x63reated\x18\x06 \x01(\t\"\xa0\x01\n\nIngredient\x12\n\n\x02id\x18\x01 \x01(\t\x12\x11\n\trecipe_id\x18\x02 \x01(\t\x12\x11\n\tfull_text\x18\x03 \x01(\t\x12\x13\n\x0bis_optional\x18\x04 \x01(\x08\x12\x0c\n\x04name\x18\x05 \x01(\t\x12\x10\n\x08quantity\x18\x06 \x01(\t\x12\x0c\n\x04unit\x18\x07 \x01(\t\x12\x0c\n\x04size\x18\x08 \x01(\t\x12\x0f\n\x07\x63reated\x18\t \x01(\t\"\xfc\x02\n\x06Recipe\x12\n\n\x02id\x18\x01 \x01(\t\x12\x12\n\nrecipe_url\x18\x02 \x01(\t\x12\r\n\x05title\x18\x03 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x04 \x01(\t\x12\x16\n\x0e\x63ooking_method\x18\x05 \x01(\t\x12\x10\n\x08\x63\x61tegory\x18\x06 \x01(\t\x12\x11\n\timage_url\x18\x07 \x01(\t\x12\x19\n\x11prep_time_minutes\x18\x08 \x01(\x05\x12\x11\n\tprep_time\x18\t \x01(\t\x12\x19\n\x11\x63ook_time_minutes\x18\n \x01(\x05\x12\x11\n\tcook_time\x18\x0b \x01(\t\x12\x1a\n\x12total_time_minutes\x18\x0c \x01(\x05\x12\x12\n\ntotal_time\x18\r \x01(\t\x12(\n\x0bingredients\x18\x0e \x03(\x0b\x32\x13.recipes.Ingredient\x12*\n\x0cinstructions\x18\x0f \x03(\x0b\x32\x14.recipes.Instruction\x12\x0f\n\x07\x63reated\x18\x10 \x01(\t\"-\n\x17GetRecipeWithURLRequest\x12\x12\n\nrecipe_url\x18\x01 \x01(\t\"A\n\x0eRecipeResponse\x12\x0e\n\x06status\x18\x01 \x01(\t\x12\x1f\n\x06recipe\x18\x02 \x01(\x0b\x32\x0f.recipes.Recipe\"&\n\x14\x43reateRecipeResponse\x12\x0e\n\x06status\x18\x01 \x01(\t2\xac\x01\n\x0eRecipesService\x12M\n\x10GetRecipeWithURL\x12 .recipes.GetRecipeWithURLRequest\x1a\x17.recipes.RecipeResponse\x12K\n\x0c\x43reateRecipe\x12\x1c.recipes.CreateRecipeRequest\x1a\x1d.recipes.CreateRecipeResponseB\x10Z\x0einternal/protob\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\rrecipes.proto\x12\x07recipes\"&\n\x07\x43RTimer\x12\r\n\x05value\x18\x01 \x01(\x05\x12\x0c\n\x04unit\x18\x02 \x01(\t\"f\n\rCRInstruction\x12\r\n\x05index\x18\x01 \x01(\x05\x12\x11\n\tfull_text\x18\x02 \x01(\t\x12\x11\n\thas_timer\x18\x03 \x01(\x08\x12 \n\x06timers\x18\x04 \x03(\x0b\x32\x10.recipes.CRTimer\"\x8b\x01\n\x0c\x43RIngredient\x12\x11\n\tfull_text\x18\x01 \x01(\t\x12\x13\n\x0bis_optional\x18\x02 \x01(\x08\x12\x0c\n\x04name\x18\x03 \x01(\t\x12\x10\n\x08quantity\x18\x04 \x01(\x02\x12\x17\n\x0fquantity_string\x18\x05 \x01(\t\x12\x0c\n\x04unit\x18\x06 \x01(\t\x12\x0c\n\x04size\x18\x07 \x01(\t\"\xb6\x02\n\x13\x43reateRecipeRequest\x12\x12\n\nrecipe_url\x18\x01 \x01(\t\x12\r\n\x05title\x18\x02 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x03 \x01(\t\x12\x16\n\x0e\x63ooking_method\x18\x04 \x01(\t\x12\x10\n\x08\x63\x61tegory\x18\x05 \x01(\t\x12\x11\n\timage_url\x18\x06 \x01(\t\x12\x19\n\x11prep_time_minutes\x18\x07 \x01(\x05\x12\x19\n\x11\x63ook_time_minutes\x18\x08 \x01(\x05\x12\x1a\n\x12total_time_minutes\x18\t \x01(\x05\x12*\n\x0bingredients\x18\n \x03(\x0b\x32\x15.recipes.CRIngredient\x12,\n\x0cinstructions\x18\x0b \x03(\x0b\x32\x16.recipes.CRInstruction\"Y\n\x05Timer\x12\n\n\x02id\x18\x01 \x01(\t\x12\x16\n\x0einstruction_id\x18\x02 \x01(\t\x12\r\n\x05value\x18\x03 \x01(\x05\x12\x0c\n\x04unit\x18\x04 \x01(\t\x12\x0f\n\x07\x63reated\x18\x05 \x01(\t\"\x92\x01\n\x0bInstruction\x12\n\n\x02id\x18\x01 \x01(\t\x12\x11\n\trecipe_id\x18\x02 \x01(\t\x12\r\n\x05index\x18\x03 \x01(\x05\x12\x11\n\tfull_text\x18\x04 \x01(\t\x12\x11\n\thas_timer\x18\x05 \x01(\x08\x12\x1e\n\x06timers\x18\x06 \x03(\x0b\x32\x0e.recipes.Timer\x12\x0f\n\x07\x63reated\x18\x07 \x01(\t\"\xb9\x01\n\nIngredient\x12\n\n\x02id\x18\x01 \x01(\t\x12\x11\n\trecipe_id\x18\x02 \x01(\t\x12\x11\n\tfull_text\x18\x03 \x01(\t\x12\x13\n\x0bis_optional\x18\x04 \x01(\x08\x12\x0c\n\x04name\x18\x05 \x01(\t\x12\x10\n\x08quantity\x18\x06 \x01(\x02\x12\x17\n\x0fquantity_string\x18\x07 \x01(\t\x12\x0c\n\x04unit\x18\x08 \x01(\t\x12\x0c\n\x04size\x18\t \x01(\t\x12\x0f\n\x07\x63reated\x18\n \x01(\t\"\xc2\x02\n\x06Recipe\x12\n\n\x02id\x18\x01 \x01(\t\x12\x12\n\nrecipe_url\x18\x02 \x01(\t\x12\r\n\x05title\x18\x03 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x04 \x01(\t\x12\x16\n\x0e\x63ooking_method\x18\x05 \x01(\t\x12\x10\n\x08\x63\x61tegory\x18\x06 \x01(\t\x12\x11\n\timage_url\x18\x07 \x01(\t\x12\x19\n\x11prep_time_minutes\x18\x08 \x01(\x05\x12\x19\n\x11\x63ook_time_minutes\x18\t \x01(\x05\x12\x1a\n\x12total_time_minutes\x18\n \x01(\x05\x12(\n\x0bingredients\x18\x0b \x03(\x0b\x32\x13.recipes.Ingredient\x12*\n\x0cinstructions\x18\x0c \x03(\x0b\x32\x14.recipes.Instruction\x12\x0f\n\x07\x63reated\x18\r \x01(\t\"-\n\x17GetRecipeWithURLRequest\x12\x12\n\nrecipe_url\x18\x01 \x01(\t\"A\n\x0eRecipeResponse\x12\x0e\n\x06status\x18\x01 \x01(\t\x12\x1f\n\x06recipe\x18\x02 \x01(\x0b\x32\x0f.recipes.Recipe\"&\n\x14\x43reateRecipeResponse\x12\x0e\n\x06status\x18\x01 \x01(\t2\xac\x01\n\x0eRecipesService\x12M\n\x10GetRecipeWithURL\x12 .recipes.GetRecipeWithURLRequest\x1a\x17.recipes.RecipeResponse\x12K\n\x0c\x43reateRecipe\x12\x1c.recipes.CreateRecipeRequest\x1a\x1d.recipes.CreateRecipeResponseB\x10Z\x0einternal/protob\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -35,25 +35,25 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['_CRTIMER']._serialized_start=26
   _globals['_CRTIMER']._serialized_end=64
   _globals['_CRINSTRUCTION']._serialized_start=66
-  _globals['_CRINSTRUCTION']._serialized_end=149
-  _globals['_CRINGREDIENT']._serialized_start=151
-  _globals['_CRINGREDIENT']._serialized_end=265
-  _globals['_CREATERECIPEREQUEST']._serialized_start=268
-  _globals['_CREATERECIPEREQUEST']._serialized_end=636
-  _globals['_TIMER']._serialized_start=638
-  _globals['_TIMER']._serialized_end=727
-  _globals['_INSTRUCTION']._serialized_start=729
-  _globals['_INSTRUCTION']._serialized_end=856
-  _globals['_INGREDIENT']._serialized_start=859
-  _globals['_INGREDIENT']._serialized_end=1019
-  _globals['_RECIPE']._serialized_start=1022
-  _globals['_RECIPE']._serialized_end=1402
-  _globals['_GETRECIPEWITHURLREQUEST']._serialized_start=1404
-  _globals['_GETRECIPEWITHURLREQUEST']._serialized_end=1449
-  _globals['_RECIPERESPONSE']._serialized_start=1451
-  _globals['_RECIPERESPONSE']._serialized_end=1516
-  _globals['_CREATERECIPERESPONSE']._serialized_start=1518
-  _globals['_CREATERECIPERESPONSE']._serialized_end=1556
-  _globals['_RECIPESSERVICE']._serialized_start=1559
-  _globals['_RECIPESSERVICE']._serialized_end=1731
+  _globals['_CRINSTRUCTION']._serialized_end=168
+  _globals['_CRINGREDIENT']._serialized_start=171
+  _globals['_CRINGREDIENT']._serialized_end=310
+  _globals['_CREATERECIPEREQUEST']._serialized_start=313
+  _globals['_CREATERECIPEREQUEST']._serialized_end=623
+  _globals['_TIMER']._serialized_start=625
+  _globals['_TIMER']._serialized_end=714
+  _globals['_INSTRUCTION']._serialized_start=717
+  _globals['_INSTRUCTION']._serialized_end=863
+  _globals['_INGREDIENT']._serialized_start=866
+  _globals['_INGREDIENT']._serialized_end=1051
+  _globals['_RECIPE']._serialized_start=1054
+  _globals['_RECIPE']._serialized_end=1376
+  _globals['_GETRECIPEWITHURLREQUEST']._serialized_start=1378
+  _globals['_GETRECIPEWITHURLREQUEST']._serialized_end=1423
+  _globals['_RECIPERESPONSE']._serialized_start=1425
+  _globals['_RECIPERESPONSE']._serialized_end=1490
+  _globals['_CREATERECIPERESPONSE']._serialized_start=1492
+  _globals['_CREATERECIPERESPONSE']._serialized_end=1530
+  _globals['_RECIPESSERVICE']._serialized_start=1533
+  _globals['_RECIPESSERVICE']._serialized_end=1705
 # @@protoc_insertion_point(module_scope)
