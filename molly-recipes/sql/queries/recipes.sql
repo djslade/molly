@@ -2,8 +2,9 @@
 INSERT INTO recipes(
     id, 
     recipe_url, 
-    title, 
-    description, 
+    title,
+    description,
+    cuisine, 
     cooking_method, 
     category, 
     image_url, 
@@ -22,6 +23,7 @@ INSERT INTO recipes(
         $7,
         $8,
         $9,
+        $10,
         NOW()
     ) RETURNING *;
 

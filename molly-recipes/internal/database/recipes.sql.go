@@ -13,8 +13,9 @@ const createRecipe = `-- name: CreateRecipe :one
 INSERT INTO recipes(
     id, 
     recipe_url, 
-    title, 
-    description, 
+    title,
+    description,
+    cuisine, 
     cooking_method, 
     category, 
     image_url, 
@@ -33,14 +34,16 @@ INSERT INTO recipes(
         $7,
         $8,
         $9,
+        $10,
         NOW()
-    ) RETURNING id, recipe_url, title, description, cooking_method, category, image_url, prep_time_minutes, cook_time_minutes, total_time_minutes, created
+    ) RETURNING id, recipe_url, title, description, cuisine, cooking_method, category, image_url, prep_time_minutes, cook_time_minutes, total_time_minutes, created
 `
 
 type CreateRecipeParams struct {
 	RecipeUrl        string
 	Title            string
 	Description      string
+	Cuisine          string
 	CookingMethod    string
 	Category         string
 	ImageUrl         string
@@ -54,6 +57,7 @@ func (q *Queries) CreateRecipe(ctx context.Context, arg CreateRecipeParams) (Rec
 		arg.RecipeUrl,
 		arg.Title,
 		arg.Description,
+		arg.Cuisine,
 		arg.CookingMethod,
 		arg.Category,
 		arg.ImageUrl,
@@ -67,6 +71,7 @@ func (q *Queries) CreateRecipe(ctx context.Context, arg CreateRecipeParams) (Rec
 		&i.RecipeUrl,
 		&i.Title,
 		&i.Description,
+		&i.Cuisine,
 		&i.CookingMethod,
 		&i.Category,
 		&i.ImageUrl,
@@ -79,7 +84,7 @@ func (q *Queries) CreateRecipe(ctx context.Context, arg CreateRecipeParams) (Rec
 }
 
 const getRecipeByURL = `-- name: GetRecipeByURL :one
-SELECT id, recipe_url, title, description, cooking_method, category, image_url, prep_time_minutes, cook_time_minutes, total_time_minutes, created FROM recipes WHERE recipe_url=$1
+SELECT id, recipe_url, title, description, cuisine, cooking_method, category, image_url, prep_time_minutes, cook_time_minutes, total_time_minutes, created FROM recipes WHERE recipe_url=$1
 `
 
 func (q *Queries) GetRecipeByURL(ctx context.Context, recipeUrl string) (Recipe, error) {
@@ -90,6 +95,7 @@ func (q *Queries) GetRecipeByURL(ctx context.Context, recipeUrl string) (Recipe,
 		&i.RecipeUrl,
 		&i.Title,
 		&i.Description,
+		&i.Cuisine,
 		&i.CookingMethod,
 		&i.Category,
 		&i.ImageUrl,

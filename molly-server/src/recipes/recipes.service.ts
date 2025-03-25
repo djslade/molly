@@ -8,6 +8,7 @@ interface IRecipesGRPCService {
     recipe_url: string;
     title: string;
     description: string;
+    cuisine: string;
     cooking_method: string;
     category: string;
     image_url: string;

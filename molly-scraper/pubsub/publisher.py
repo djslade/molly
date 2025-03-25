@@ -1,4 +1,5 @@
 from pika.channel import Channel
+from .publish_body import PublishBody
 import json
 
 class Publisher():
@@ -8,9 +9,9 @@ class Publisher():
         self.__exchange:str = exchange
     
 
-    def publish(self, body:dict):
+    def publish(self, body:PublishBody):
         self.__channel.basic_publish(
             exchange=self.__exchange, 
             routing_key=self.__queue, 
-            body=json.dumps(body)
+            body=body.to_string()
         )

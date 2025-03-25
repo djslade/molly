@@ -37,6 +37,7 @@ type Recipe struct {
 	RecipeUrl        string
 	Title            string
 	Description      string
+	Cuisine          string
 	CookingMethod    string
 	Category         string
 	ImageUrl         string

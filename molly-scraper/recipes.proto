@@ -36,13 +36,14 @@ message CreateRecipeRequest {
     string title = 2;
     string description = 3;
     string cooking_method = 4;
-    string category = 5;
-    string image_url = 6;
-    int32 prep_time_minutes = 7;
-    int32 cook_time_minutes = 8;
-    int32 total_time_minutes = 9;
-    repeated CRIngredient ingredients = 10;
-    repeated CRInstruction instructions = 11;
+    string cuisine = 5;
+    string category = 6;
+    string image_url = 7;
+    int32 prep_time_minutes = 8;
+    int32 cook_time_minutes = 9;
+    int32 total_time_minutes = 10;
+    repeated CRIngredient ingredients = 11;
+    repeated CRInstruction instructions = 12;
 }
 
 message Timer {
@@ -81,15 +82,16 @@ message Recipe {
     string recipe_url = 2;
     string title = 3;
     string description = 4;
-    string cooking_method = 5;
-    string category = 6;
-    string image_url = 7;
-    int32 prep_time_minutes = 8;
-    int32 cook_time_minutes = 9;
-    int32 total_time_minutes = 10;
-    repeated Ingredient ingredients = 11;
-    repeated Instruction instructions = 12;
-    string created = 13;
+    string cuisine = 5;
+    string cooking_method = 6;
+    string category = 7;
+    string image_url = 8;
+    int32 prep_time_minutes = 9;
+    int32 cook_time_minutes = 10;
+    int32 total_time_minutes = 11;
+    repeated Ingredient ingredients = 12;
+    repeated Instruction instructions = 13;
+    string created = 14;
 }
 
 message GetRecipeWithURLRequest {
