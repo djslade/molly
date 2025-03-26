@@ -4,12 +4,12 @@ import {
   OnGatewayDisconnect,
   SubscribeMessage,
 } from '@nestjs/websockets';
-import { Socket } from 'socket.io';
+import { Server, Socket } from 'socket.io';
 import { RecipesService } from 'src/recipes/recipes.service';
 import { PubsubService } from 'src/pubsub/pubsub.service';
 import { ScraperService } from './scraper.service';
 
-@WebSocketGateway()
+@WebSocketGateway({ cors: true })
 export class ScraperGateway
   implements OnGatewayConnection, OnGatewayDisconnect
 {

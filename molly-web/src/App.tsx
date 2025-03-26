@@ -1,22 +1,19 @@
 import "./App.css";
-import { Button } from "./components/ui/button";
+import { Guide } from "./modules/guide/Guide";
 
 function App() {
   return (
     <>
-      <header className="h-20 flex items-center justify-between bg-accent-foreground">
-        Molly
+      <header className="h-20 items-center justify-between bg-violet-950 flex">
+        <div className="px-6">
+          <a href="/">
+            <h1 className="text-3xl font-black text-violet-50">molly</h1>
+          </a>
+        </div>
       </header>
-      <h1>Cooking Made Easy</h1>
-      <h2>
-        Home cooking got you down? Leave it to Molly. Your personalized Sous
-        Chef will guide you step by step through recipes, from prep to plating.
-      </h2>
-      <Button variant="default" size="lg">
-        Get started
-      </Button>
-      <h2>No Hallucinations</h2>
-      <p>Molly is not powered by an LLM. She's built for humans, by humans.</p>
+      <main className="min-h-[calc(100vh-80px)] p-6 bg-violet-300 flex flex-col justify-center">
+        <Guide />
+      </main>
     </>
   );
 }
