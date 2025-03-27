@@ -44,7 +44,7 @@ class Scraper:
     
     def __scrape_recipe(self, raw_url:str):
         html = self.__get_html(raw_url)
-        scraper = scrape_html(html, org_url=raw_url)
+        scraper = scrape_html(html, org_url=raw_url, supported_only=False)
         return scraper
     
     

@@ -1,9 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ChangeEvent, useEffect, useState } from "react";
-import { socket } from "../utils/socket";
-import { SocketResponse } from "../types/socketResponse";
-import { Recipe } from "../types/recipe";
+import { socket } from "../../search/utils/socket";
+import { SocketResponse } from "../../../types/socketResponse";
+import { Recipe } from "../../../types/recipe";
 
 interface GetRecipeProps {
   setRecipeData: React.Dispatch<React.SetStateAction<Recipe | null>>;
@@ -65,7 +65,9 @@ export const GetRecipe = ({ setRecipeData, next }: GetRecipeProps) => {
           value={recipeURL}
           onChange={changeRecipeURL}
         />
-        <Button onClick={onSubmit}>Next</Button>
+        <Button onClick={onSubmit} disabled={loading}>
+          Next
+        </Button>
       </div>
     </section>
   );

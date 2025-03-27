@@ -1,22 +1,30 @@
-import { Recipe } from "../types/recipe";
+import { Button } from "@/components/ui/button";
+import { PrevPanel } from "../../../types/prevPanel";
+import { NextPanel } from "../../../types/nextPanel";
+import { GuidePanel } from "@/types/guidePanel";
+import { Card, CardTitle } from "@/components/ui/card";
 
-interface IngredientsPanelProps {
-  recipeData: Recipe | null;
-}
+interface IngredientsPanelProps extends GuidePanel, PrevPanel, NextPanel {}
 
-export const IngredientsPanel = ({ recipeData }: IngredientsPanelProps) => {
+export const IngredientsPanel = ({
+  recipeData,
+  next,
+  prev,
+}: IngredientsPanelProps) => {
   return (
-    <section>
-      <h1 className="font-bold text-3xl">Step 2: Gather the ingredients</h1>
+    <Card>
+      <CardTitle>Step 2: Gather the ingredients</CardTitle>
       {recipeData && (
         <div>
           {recipeData.ingredients.map((ingredient) => (
-            <div>
-              <span key={ingredient.id}>{ingredient.full_text}</span>
+            <div key={ingredient.id}>
+              <span>{ingredient.full_text}</span>
             </div>
           ))}
         </div>
       )}
-    </section>
+      <Button onClick={next}>Back</Button>
+      <Button onClick={prev}>Next</Button>
+    </Card>
   );
 };

@@ -10,7 +10,8 @@ export class ScraperController {
     private readonly scraperService: ScraperService,
   ) {}
   @EventPattern('scraper.results.ok')
-  async handleScraperOK(@Payload() url: string) {
+  async handleScraperOK(@Payload() data: { url: string }): Promise<void> {
+    const { url } = data;
     const res = await this.recipeService.getRecipeWithURL(url);
     await this.recipeService.cacheRecipe(res, url);
     return this.scraperService.sendResult(url, res);
@@ -19,9 +20,7 @@ export class ScraperController {
   @EventPattern('scraper.results.invalid')
   handleScraperInvalid() {
     // This pattern indicates that the URL is not defined properly in the request body.
-    console.error(
-      "Scraper service indicated that a request was invalid. Ensure that this isn't possible.",
-    );
+    console.error('Scraper service indicated that a request was invalid.');
   }
 
   @EventPattern('scraper.results.fail')
