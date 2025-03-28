@@ -1,13 +1,14 @@
 import { useState } from "react";
-import { Recipe } from "../../types/recipe";
 import { Steps } from "../../types/steps";
 import { IngredientsPanel } from "./components/IngredientsPanel";
-import { InstructionsPanek } from "./components/InstructionsPanek";
+import { InstructionsPanel } from "./components/InstructionsPanel";
 import { OverviewPanel } from "./components/OverviewPanel";
 
-export const GuideModule = () => {
-  const [recipeData] = useState<Recipe | undefined>();
+interface GuideModuleProps {
+  recipeData: any;
+}
 
+export const GuideModule = ({ recipeData }: GuideModuleProps) => {
   const [guideStep, setGuideStep] = useState<Steps>(Steps.Start);
 
   const changeStep = (step: Steps) => {
@@ -21,7 +22,7 @@ export const GuideModule = () => {
       {guideStep === Steps.Start && (
         <OverviewPanel
           recipeData={recipeData}
-          next={changeStep(Steps.Instructions)}
+          next={changeStep(Steps.Ingredients)}
         />
       )}
       {guideStep === Steps.Ingredients && (
@@ -32,7 +33,7 @@ export const GuideModule = () => {
         />
       )}
       {guideStep === Steps.Instructions && (
-        <InstructionsPanek
+        <InstructionsPanel
           recipeData={recipeData}
           prev={changeStep(Steps.Ingredients)}
           next={changeStep(Steps.Finished)}

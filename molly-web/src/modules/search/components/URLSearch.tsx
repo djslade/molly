@@ -4,12 +4,11 @@ import { ChangeEvent, useEffect, useState } from "react";
 import { socket } from "../utils/socket";
 import { SocketResponse } from "@/types/socketResponse";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
-import { useSetAtom } from "jotai";
-import { recipeAtom } from "@/store/recipe";
 import { ClipLoader } from "react-spinners";
+import { useNavigate } from "react-router";
 
 export const URLSearch = () => {
-  const setRecipeData = useSetAtom(recipeAtom);
+  const navigate = useNavigate();
 
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -22,10 +21,10 @@ export const URLSearch = () => {
 
   const handleResult = (value: SocketResponse) => {
     try {
-      if (value.status != "OK") {
-        throw new Error(value.status);
+      if (!value.id) {
+        throw new Error("oh no!");
       }
-      setRecipeData(value.recipe);
+      navigate(`/recipe/${value.id}`);
     } catch (err) {
       console.log(err);
     } finally {

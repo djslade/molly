@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 
 interface InstructionssPanelProps extends GuidePanel, PrevPanel, NextPanel {}
 
-export const InstructionsPanek = ({
+export const InstructionsPanel = ({
   recipeData,
   prev,
   next,
