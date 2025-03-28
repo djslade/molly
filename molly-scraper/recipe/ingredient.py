@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from .recipe_model import RecipeModel
-from protoc import CRIngredient
+from protoc import Ingredient as CRIngredient
 
 @dataclass
 class Ingredient(RecipeModel):

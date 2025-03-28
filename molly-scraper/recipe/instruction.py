@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from .recipe_model import RecipeModel
 from .timer import Timer
-from protoc import CRInstruction
+from protoc import Instruction as CRInstruction
 
 @dataclass
 class Instruction(RecipeModel):

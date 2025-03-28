@@ -8,6 +8,10 @@ import (
 var (
 	ErrInvalidRecipeURL error = status.Error(
 		codes.InvalidArgument,
+		"recipe URL is invalid",
+	)
+	ErrInvalidRecipeID error = status.Error(
+		codes.InvalidArgument,
 		"recipe ID is invalid",
 	)
 	ErrRecipeNotFound error = status.Error(

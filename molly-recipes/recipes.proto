@@ -5,47 +5,10 @@ option go_package = "internal/proto";
 package recipes;
 
 service RecipesService {
-    rpc GetRecipeWithURL (GetRecipeWithURLRequest) returns (RecipeResponse);
-    rpc CreateRecipe (CreateRecipeRequest) returns (CreateRecipeResponse);
-}
-
-message CRTimer {
-    int32 value = 1;
-    string unit = 2;
-}
-
-message CRInstruction {
-    int32 index = 1;
-    string full_text = 2;
-    bool has_timer = 3;
-    repeated CRTimer timers = 4;
-}
-
-message CRIngredient {
-    string full_text = 1;
-    bool is_optional = 2;
-    string name = 3;
-    float quantity = 4;
-    string quantity_string = 5;
-    string unit = 6;
-    string size = 7;
-    string ingredient_group = 8;
-}
-
-message CreateRecipeRequest {
-    string recipe_url = 1;
-    string title = 2;
-    string description = 3;
-    string cooking_method = 4;
-    string cuisine = 5;
-    string category = 6;
-    string image_url = 7;
-    string yields = 8;
-    int32 prep_time_minutes = 9;
-    int32 cook_time_minutes = 10;
-    int32 total_time_minutes = 11;
-    repeated CRIngredient ingredients = 12;
-    repeated CRInstruction instructions = 13;
+    rpc GetRecipeWithURL (GetRecipeWithURLRequest) returns (RecipeIDResponse);
+    rpc CreateRecipe (CreateRecipeRequest) returns (RecipeIDResponse);
+    rpc GetRecipeWithID (GetRecipeWithIDRequest) returns (RecipeResponse);
+    rpc SearchRecipes (SearchRecipesRequest) returns (RecipesResponse);
 }
 
 message Timer {
@@ -102,11 +65,28 @@ message GetRecipeWithURLRequest {
     string recipe_url = 1;
 }
 
-message RecipeResponse {
-    string status = 1;
-    Recipe recipe = 2;
+message CreateRecipeRequest {
+    Recipe recipe = 1;
 }
 
-message CreateRecipeResponse {
-    string status = 1;
+message GetRecipeWithIDRequest {
+    string id = 1;
+}
+
+message RecipeIDResponse {
+    string id = 1;
+}
+
+message RecipeResponse {
+    Recipe recipe = 1;
+}
+
+message SearchRecipesRequest {
+    string query = 1;
+    int32 page = 2;
+    int32 results_per_page = 3;
+}
+
+message RecipesResponse {
+    repeated Recipe recipes = 1;
 }

@@ -37,14 +37,8 @@ export class ScraperGateway
       this.scraperService.sendErrorMessage(client, res);
       return;
     }
-    const recipe = await this.recipesService.checkCache(url);
-    if (recipe !== null) {
-      this.scraperService.sendResult(url, recipe);
-      return;
-    }
     try {
       const res = await this.recipesService.getRecipeWithURL(url);
-      await this.recipesService.cacheRecipe(res, url);
       this.scraperService.sendResult(url, res);
     } catch (err) {
       this.pubsubService.sendScraperRequest({ url });

@@ -7,6 +7,8 @@ package database
 
 import (
 	"context"
+
+	"github.com/google/uuid"
 )
 
 const createRecipe = `-- name: CreateRecipe :one
@@ -69,6 +71,40 @@ func (q *Queries) CreateRecipe(ctx context.Context, arg CreateRecipeParams) (Rec
 		arg.CookTimeMinutes,
 		arg.TotalTimeMinutes,
 	)
+	var i Recipe
+	err := row.Scan(
+		&i.ID,
+		&i.RecipeUrl,
+		&i.Title,
+		&i.Description,
+		&i.Cuisine,
+		&i.CookingMethod,
+		&i.Category,
+		&i.ImageUrl,
+		&i.Yields,
+		&i.PrepTimeMinutes,
+		&i.CookTimeMinutes,
+		&i.TotalTimeMinutes,
+		&i.Created,
+	)
+	return i, err
+}
+
+const deleteRecipe = `-- name: DeleteRecipe :exec
+DELETE FROM recipes WHERE id=$1
+`
+
+func (q *Queries) DeleteRecipe(ctx context.Context, id uuid.UUID) error {
+	_, err := q.db.ExecContext(ctx, deleteRecipe, id)
+	return err
+}
+
+const getRecipeByID = `-- name: GetRecipeByID :one
+SELECT id, recipe_url, title, description, cuisine, cooking_method, category, image_url, yields, prep_time_minutes, cook_time_minutes, total_time_minutes, created FROM recipes WHERE id=$1
+`
+
+func (q *Queries) GetRecipeByID(ctx context.Context, id uuid.UUID) (Recipe, error) {
+	row := q.db.QueryRowContext(ctx, getRecipeByID, id)
 	var i Recipe
 	err := row.Scan(
 		&i.ID,

@@ -4,7 +4,7 @@ import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 
 export const SearchModule = () => {
   return (
-    <Tabs defaultValue="url" className="max-w-[720px] w-full">
+    <Tabs defaultValue="url" className="max-w-4xl w-full">
       <TabsList className="grid w-full grid-cols-2">
         <TabsTrigger value="url">With URL</TabsTrigger>
         <TabsTrigger value="browse">Browse</TabsTrigger>

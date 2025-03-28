@@ -1,52 +1,8 @@
-import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
+import { HttpCode, Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { ClientGrpc } from '@nestjs/microservices';
 import { Observable, lastValueFrom } from 'rxjs';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
-
-type GRPCRecipe = {
-  id: string;
-  recipe_url: string;
-  title: string;
-  description: string;
-  cuisine: string;
-  cooking_method: string;
-  category: string;
-  image_url: string;
-  yields: string;
-  prep_time_minutes: number;
-  cook_time_minutes: number;
-  total_time_minutes: number;
-  created: string;
-  ingredients: {
-    id: string;
-    recipe_id: string;
-    full_text: string;
-    is_optional: boolean;
-    name: string;
-    quantity: number;
-    quantity_string: string;
-    unit: string;
-    size: string;
-    ingredient_group: string;
-    created: string;
-  }[];
-  instructions: {
-    id: string;
-    recipe_id: string;
-    index: number;
-    full_text: string;
-    has_timer: boolean;
-    created: string;
-    timers: {
-      id: string;
-      instruction_id: string;
-      value: number;
-      unit: string;
-      created: string;
-    }[];
-  }[];
-};
 
 interface IRecipesGRPCService {
   GetRecipeWithURL(data: { recipe_url: string }): Observable<any>;
@@ -82,6 +38,7 @@ interface IRecipesGRPCService {
       }[];
     }[];
   }): Observable<any>;
+  GetRecipeWithID(data: { id: string }): Observable<any>;
 }
 
 @Injectable()
@@ -99,14 +56,15 @@ export class RecipesService implements OnModuleInit {
       this.client.getService<IRecipesGRPCService>('RecipesService');
   }
 
-  findOne(id: string) {
-    return `This action returns a ${id} recipe`;
-  }
-
   getRecipeWithURL(url: string): Promise<any> {
     return lastValueFrom(
       this.recipesService.GetRecipeWithURL({ recipe_url: url }),
     );
+  }
+
+  GetRecipeWithID(id: string): Promise<any> {
+    console.log(id);
+    return lastValueFrom(this.recipesService.GetRecipeWithID({ id }));
   }
 
   async cacheRecipe(res: any, url: string) {
@@ -118,8 +76,28 @@ export class RecipesService implements OnModuleInit {
     }
   }
 
-  async checkCache(url: string): Promise<any> {
-    const key = `recipe.${url}`;
+  async checkCache(id: string): Promise<any> {
+    const key = `recipe.${id}`;
     return await this.cacheManager.get(key);
+  }
+
+  @HttpCode(200)
+  recipeFound(recipe: any) {
+    return { status: 'OK', recipe };
+  }
+
+  @HttpCode(404)
+  recipeNotFound() {
+    return { status: 'Not found' };
+  }
+
+  @HttpCode(409)
+  recipeInvalidID() {
+    return { status: 'Invalid ID' };
+  }
+
+  @HttpCode(500)
+  recipeInternalServerError() {
+    return { status: 'Internal server error' };
   }
 }

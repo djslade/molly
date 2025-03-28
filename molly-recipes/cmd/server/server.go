@@ -8,19 +8,23 @@ import (
 
 	"github.com/djslade/molly-recipes/internal/database"
 	pb "github.com/djslade/molly-recipes/internal/proto"
+	"github.com/google/uuid"
 )
 
 func newServer(db *database.Queries, logger *log.Logger) *server {
 	return &server{db: db, logger: logger}
 }
 
-func (srv *server) GetRecipeWithURL(ctx context.Context, req *pb.GetRecipeWithURLRequest) (*pb.RecipeResponse, error) {
-	recipeURL, err := normalizeUrl(req.GetRecipeUrl())
+func (srv *server) GetRecipeWithID(ctx context.Context, req *pb.GetRecipeWithIDRequest) (*pb.RecipeResponse, error) {
+	srv.logger.Println("hello")
+	srv.logger.Println(req.GetId())
+	recipeID, err := uuid.Parse(req.GetId())
 	if err != nil {
-		return nil, ErrInvalidRecipeURL
+		return nil, ErrInvalidRecipeID
 	}
+	srv.logger.Println(recipeID)
 
-	foundRecipe, err := srv.db.GetRecipeByURL(ctx, recipeURL)
+	foundRecipe, err := srv.db.GetRecipeByID(ctx, recipeID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, ErrRecipeNotFound
@@ -105,13 +109,34 @@ func (srv *server) GetRecipeWithURL(ctx context.Context, req *pb.GetRecipeWithUR
 	recipe.Instructions = instructions
 
 	return &pb.RecipeResponse{
-		Status: "OK",
 		Recipe: &recipe,
 	}, nil
 }
 
-func (srv *server) CreateRecipe(ctx context.Context, req *pb.CreateRecipeRequest) (*pb.CreateRecipeResponse, error) {
+func (srv *server) GetRecipeWithURL(ctx context.Context, req *pb.GetRecipeWithURLRequest) (*pb.RecipeIDResponse, error) {
 	recipeURL, err := normalizeUrl(req.GetRecipeUrl())
+	if err != nil {
+		return nil, ErrInvalidRecipeURL
+	}
+
+	recipe, err := srv.db.GetRecipeByURL(ctx, recipeURL)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, ErrRecipeNotFound
+		}
+		srv.logger.Printf("database error: %v", err.Error())
+		return nil, ErrInternalServerError
+	}
+
+	return &pb.RecipeIDResponse{
+		Id: recipe.ID.String(),
+	}, nil
+}
+
+func (srv *server) CreateRecipe(ctx context.Context, req *pb.CreateRecipeRequest) (*pb.RecipeIDResponse, error) {
+	reqRecipe := req.GetRecipe()
+
+	recipeURL, err := normalizeUrl(reqRecipe.GetRecipeUrl())
 	if err != nil {
 		srv.logger.Printf("at recipeURL: %v", err)
 		return nil, ErrInvalidRecipeURL
@@ -119,23 +144,23 @@ func (srv *server) CreateRecipe(ctx context.Context, req *pb.CreateRecipeRequest
 
 	recipe, err := srv.db.CreateRecipe(ctx, database.CreateRecipeParams{
 		RecipeUrl:        recipeURL,
-		Title:            req.GetTitle(),
-		Description:      req.GetDescription(),
-		CookingMethod:    req.GetCookingMethod(),
-		Cuisine:          req.GetCuisine(),
-		Category:         req.GetCategory(),
-		ImageUrl:         req.GetImageUrl(),
-		Yields:           req.GetYields(),
-		PrepTimeMinutes:  req.GetPrepTimeMinutes(),
-		CookTimeMinutes:  req.GetCookTimeMinutes(),
-		TotalTimeMinutes: req.GetTotalTimeMinutes(),
+		Title:            reqRecipe.GetTitle(),
+		Description:      reqRecipe.GetDescription(),
+		CookingMethod:    reqRecipe.GetCookingMethod(),
+		Cuisine:          reqRecipe.GetCuisine(),
+		Category:         reqRecipe.GetCategory(),
+		ImageUrl:         reqRecipe.GetImageUrl(),
+		Yields:           reqRecipe.GetYields(),
+		PrepTimeMinutes:  reqRecipe.GetPrepTimeMinutes(),
+		CookTimeMinutes:  reqRecipe.GetCookTimeMinutes(),
+		TotalTimeMinutes: reqRecipe.GetTotalTimeMinutes(),
 	})
 	if err != nil {
 		srv.logger.Printf("database error: %v", err.Error())
 		return nil, ErrInternalServerError
 	}
 
-	for _, ingredient := range req.GetIngredients() {
+	for _, ingredient := range reqRecipe.GetIngredients() {
 		_, err := srv.db.CreateIngredient(ctx, database.CreateIngredientParams{
 			RecipeID:        recipe.ID,
 			FullText:        ingredient.GetFullText(),
@@ -153,7 +178,7 @@ func (srv *server) CreateRecipe(ctx context.Context, req *pb.CreateRecipeRequest
 		}
 	}
 
-	for _, instruction := range req.GetInstructions() {
+	for _, instruction := range reqRecipe.GetInstructions() {
 		newInstruction, err := srv.db.CreateInstruction(ctx, database.CreateInstructionParams{
 			RecipeID: recipe.ID,
 			Index:    instruction.GetIndex(),
@@ -178,7 +203,5 @@ func (srv *server) CreateRecipe(ctx context.Context, req *pb.CreateRecipeRequest
 		}
 	}
 
-	return &pb.CreateRecipeResponse{
-		Status: "Created",
-	}, nil
+	return &pb.RecipeIDResponse{Id: recipe.ID.String()}, nil
 }

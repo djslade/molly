@@ -1,6 +1,10 @@
 from typing import List
 
 class CreateRecipeRequest:
+    recipe: Recipe
+
+class Recipe:
+    id: str
     recipe_url: str
     title: str
     description: str
@@ -12,10 +16,13 @@ class CreateRecipeRequest:
     prep_time_minutes: int
     cook_time_minutes: int
     total_time_minutes: int
-    ingredients: List['CRIngredient']
-    instructions: List['CRInstruction']
+    ingredients: List['Ingredient']
+    instructions: List['Instruction']
+    created: str
 
-class CRIngredient:
+class Ingredient:
+    id: str
+    recipe_id: str
     full_text: str
     is_optional: bool
     name: str
@@ -23,14 +30,21 @@ class CRIngredient:
     quantity_string: str
     unit: str
     size: str
+    created: str
 
-class CRInstruction:
+class Instruction:
+    id: str
+    recipe_id: str
     index: int
     full_text: str
     has_timer: bool
-    timers: List['CRTimer']
+    timers: List['Timer']
+    created: str
 
-class CRTimer:
+class Timer:
+    id: str
+    instruction_id: str
     value: int
     unit: str
+    created: str
 

@@ -21,14 +21,18 @@ const _ = grpc.SupportPackageIsVersion9
 const (
 	RecipesService_GetRecipeWithURL_FullMethodName = "/recipes.RecipesService/GetRecipeWithURL"
 	RecipesService_CreateRecipe_FullMethodName     = "/recipes.RecipesService/CreateRecipe"
+	RecipesService_GetRecipeWithID_FullMethodName  = "/recipes.RecipesService/GetRecipeWithID"
+	RecipesService_SearchRecipes_FullMethodName    = "/recipes.RecipesService/SearchRecipes"
 )
 
 // RecipesServiceClient is the client API for RecipesService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type RecipesServiceClient interface {
-	GetRecipeWithURL(ctx context.Context, in *GetRecipeWithURLRequest, opts ...grpc.CallOption) (*RecipeResponse, error)
-	CreateRecipe(ctx context.Context, in *CreateRecipeRequest, opts ...grpc.CallOption) (*CreateRecipeResponse, error)
+	GetRecipeWithURL(ctx context.Context, in *GetRecipeWithURLRequest, opts ...grpc.CallOption) (*RecipeIDResponse, error)
+	CreateRecipe(ctx context.Context, in *CreateRecipeRequest, opts ...grpc.CallOption) (*RecipeIDResponse, error)
+	GetRecipeWithID(ctx context.Context, in *GetRecipeWithIDRequest, opts ...grpc.CallOption) (*RecipeResponse, error)
+	SearchRecipes(ctx context.Context, in *SearchRecipesRequest, opts ...grpc.CallOption) (*RecipesResponse, error)
 }
 
 type recipesServiceClient struct {
@@ -39,9 +43,9 @@ func NewRecipesServiceClient(cc grpc.ClientConnInterface) RecipesServiceClient {
 	return &recipesServiceClient{cc}
 }
 
-func (c *recipesServiceClient) GetRecipeWithURL(ctx context.Context, in *GetRecipeWithURLRequest, opts ...grpc.CallOption) (*RecipeResponse, error) {
+func (c *recipesServiceClient) GetRecipeWithURL(ctx context.Context, in *GetRecipeWithURLRequest, opts ...grpc.CallOption) (*RecipeIDResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(RecipeResponse)
+	out := new(RecipeIDResponse)
 	err := c.cc.Invoke(ctx, RecipesService_GetRecipeWithURL_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -49,10 +53,30 @@ func (c *recipesServiceClient) GetRecipeWithURL(ctx context.Context, in *GetReci
 	return out, nil
 }
 
-func (c *recipesServiceClient) CreateRecipe(ctx context.Context, in *CreateRecipeRequest, opts ...grpc.CallOption) (*CreateRecipeResponse, error) {
+func (c *recipesServiceClient) CreateRecipe(ctx context.Context, in *CreateRecipeRequest, opts ...grpc.CallOption) (*RecipeIDResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(CreateRecipeResponse)
+	out := new(RecipeIDResponse)
 	err := c.cc.Invoke(ctx, RecipesService_CreateRecipe_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *recipesServiceClient) GetRecipeWithID(ctx context.Context, in *GetRecipeWithIDRequest, opts ...grpc.CallOption) (*RecipeResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RecipeResponse)
+	err := c.cc.Invoke(ctx, RecipesService_GetRecipeWithID_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *recipesServiceClient) SearchRecipes(ctx context.Context, in *SearchRecipesRequest, opts ...grpc.CallOption) (*RecipesResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RecipesResponse)
+	err := c.cc.Invoke(ctx, RecipesService_SearchRecipes_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -63,8 +87,10 @@ func (c *recipesServiceClient) CreateRecipe(ctx context.Context, in *CreateRecip
 // All implementations must embed UnimplementedRecipesServiceServer
 // for forward compatibility.
 type RecipesServiceServer interface {
-	GetRecipeWithURL(context.Context, *GetRecipeWithURLRequest) (*RecipeResponse, error)
-	CreateRecipe(context.Context, *CreateRecipeRequest) (*CreateRecipeResponse, error)
+	GetRecipeWithURL(context.Context, *GetRecipeWithURLRequest) (*RecipeIDResponse, error)
+	CreateRecipe(context.Context, *CreateRecipeRequest) (*RecipeIDResponse, error)
+	GetRecipeWithID(context.Context, *GetRecipeWithIDRequest) (*RecipeResponse, error)
+	SearchRecipes(context.Context, *SearchRecipesRequest) (*RecipesResponse, error)
 	mustEmbedUnimplementedRecipesServiceServer()
 }
 
@@ -75,11 +101,17 @@ type RecipesServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedRecipesServiceServer struct{}
 
-func (UnimplementedRecipesServiceServer) GetRecipeWithURL(context.Context, *GetRecipeWithURLRequest) (*RecipeResponse, error) {
+func (UnimplementedRecipesServiceServer) GetRecipeWithURL(context.Context, *GetRecipeWithURLRequest) (*RecipeIDResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetRecipeWithURL not implemented")
 }
-func (UnimplementedRecipesServiceServer) CreateRecipe(context.Context, *CreateRecipeRequest) (*CreateRecipeResponse, error) {
+func (UnimplementedRecipesServiceServer) CreateRecipe(context.Context, *CreateRecipeRequest) (*RecipeIDResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateRecipe not implemented")
+}
+func (UnimplementedRecipesServiceServer) GetRecipeWithID(context.Context, *GetRecipeWithIDRequest) (*RecipeResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetRecipeWithID not implemented")
+}
+func (UnimplementedRecipesServiceServer) SearchRecipes(context.Context, *SearchRecipesRequest) (*RecipesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SearchRecipes not implemented")
 }
 func (UnimplementedRecipesServiceServer) mustEmbedUnimplementedRecipesServiceServer() {}
 func (UnimplementedRecipesServiceServer) testEmbeddedByValue()                        {}
@@ -138,6 +170,42 @@ func _RecipesService_CreateRecipe_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _RecipesService_GetRecipeWithID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetRecipeWithIDRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RecipesServiceServer).GetRecipeWithID(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: RecipesService_GetRecipeWithID_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RecipesServiceServer).GetRecipeWithID(ctx, req.(*GetRecipeWithIDRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _RecipesService_SearchRecipes_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SearchRecipesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RecipesServiceServer).SearchRecipes(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: RecipesService_SearchRecipes_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RecipesServiceServer).SearchRecipes(ctx, req.(*SearchRecipesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // RecipesService_ServiceDesc is the grpc.ServiceDesc for RecipesService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -152,6 +220,14 @@ var RecipesService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateRecipe",
 			Handler:    _RecipesService_CreateRecipe_Handler,
+		},
+		{
+			MethodName: "GetRecipeWithID",
+			Handler:    _RecipesService_GetRecipeWithID_Handler,
+		},
+		{
+			MethodName: "SearchRecipes",
+			Handler:    _RecipesService_SearchRecipes_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

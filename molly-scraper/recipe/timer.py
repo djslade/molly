@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from .recipe_model import RecipeModel
-from protoc import CRTimer
+from protoc import Timer as CRTimer
 
 @dataclass
 class Timer(RecipeModel):

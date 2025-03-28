@@ -37,12 +37,22 @@ class RecipesServiceStub(object):
         self.GetRecipeWithURL = channel.unary_unary(
                 '/recipes.RecipesService/GetRecipeWithURL',
                 request_serializer=recipes__pb2.GetRecipeWithURLRequest.SerializeToString,
-                response_deserializer=recipes__pb2.RecipeResponse.FromString,
+                response_deserializer=recipes__pb2.RecipeIDResponse.FromString,
                 _registered_method=True)
         self.CreateRecipe = channel.unary_unary(
                 '/recipes.RecipesService/CreateRecipe',
                 request_serializer=recipes__pb2.CreateRecipeRequest.SerializeToString,
-                response_deserializer=recipes__pb2.CreateRecipeResponse.FromString,
+                response_deserializer=recipes__pb2.RecipeIDResponse.FromString,
+                _registered_method=True)
+        self.GetRecipeWithID = channel.unary_unary(
+                '/recipes.RecipesService/GetRecipeWithID',
+                request_serializer=recipes__pb2.GetRecipeWithIDRequest.SerializeToString,
+                response_deserializer=recipes__pb2.RecipeResponse.FromString,
+                _registered_method=True)
+        self.SearchRecipes = channel.unary_unary(
+                '/recipes.RecipesService/SearchRecipes',
+                request_serializer=recipes__pb2.SearchRecipesRequest.SerializeToString,
+                response_deserializer=recipes__pb2.RecipesResponse.FromString,
                 _registered_method=True)
 
 
@@ -61,18 +71,40 @@ class RecipesServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def GetRecipeWithID(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def SearchRecipes(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_RecipesServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'GetRecipeWithURL': grpc.unary_unary_rpc_method_handler(
                     servicer.GetRecipeWithURL,
                     request_deserializer=recipes__pb2.GetRecipeWithURLRequest.FromString,
-                    response_serializer=recipes__pb2.RecipeResponse.SerializeToString,
+                    response_serializer=recipes__pb2.RecipeIDResponse.SerializeToString,
             ),
             'CreateRecipe': grpc.unary_unary_rpc_method_handler(
                     servicer.CreateRecipe,
                     request_deserializer=recipes__pb2.CreateRecipeRequest.FromString,
-                    response_serializer=recipes__pb2.CreateRecipeResponse.SerializeToString,
+                    response_serializer=recipes__pb2.RecipeIDResponse.SerializeToString,
+            ),
+            'GetRecipeWithID': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetRecipeWithID,
+                    request_deserializer=recipes__pb2.GetRecipeWithIDRequest.FromString,
+                    response_serializer=recipes__pb2.RecipeResponse.SerializeToString,
+            ),
+            'SearchRecipes': grpc.unary_unary_rpc_method_handler(
+                    servicer.SearchRecipes,
+                    request_deserializer=recipes__pb2.SearchRecipesRequest.FromString,
+                    response_serializer=recipes__pb2.RecipesResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -101,7 +133,7 @@ class RecipesService(object):
             target,
             '/recipes.RecipesService/GetRecipeWithURL',
             recipes__pb2.GetRecipeWithURLRequest.SerializeToString,
-            recipes__pb2.RecipeResponse.FromString,
+            recipes__pb2.RecipeIDResponse.FromString,
             options,
             channel_credentials,
             insecure,
@@ -128,7 +160,61 @@ class RecipesService(object):
             target,
             '/recipes.RecipesService/CreateRecipe',
             recipes__pb2.CreateRecipeRequest.SerializeToString,
-            recipes__pb2.CreateRecipeResponse.FromString,
+            recipes__pb2.RecipeIDResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def GetRecipeWithID(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/recipes.RecipesService/GetRecipeWithID',
+            recipes__pb2.GetRecipeWithIDRequest.SerializeToString,
+            recipes__pb2.RecipeResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def SearchRecipes(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/recipes.RecipesService/SearchRecipes',
+            recipes__pb2.SearchRecipesRequest.SerializeToString,
+            recipes__pb2.RecipesResponse.FromString,
             options,
             channel_credentials,
             insecure,

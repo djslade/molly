@@ -1,4 +1,4 @@
-from protoc import CreateRecipeRequest
+from protoc import CreateRecipeRequest, Recipe as CRRecipe
 from dataclasses import dataclass
 from .recipe_model import RecipeModel
 from .ingredient import Ingredient
@@ -41,7 +41,7 @@ class Recipe(RecipeModel):
     
     
     def grpc(self) -> CreateRecipeRequest:
-        request = CreateRecipeRequest(
+        req_recipe = CRRecipe(
             title=self.title,
             recipe_url=self.recipe_url,
             description=self.description,
@@ -56,4 +56,4 @@ class Recipe(RecipeModel):
             ingredients=[ingredient.grpc() for ingredient in self.ingredients],
             instructions=[instruction.grpc() for instruction in self.instructions],
         )
-        return request
+        return CreateRecipeRequest(recipe=req_recipe)

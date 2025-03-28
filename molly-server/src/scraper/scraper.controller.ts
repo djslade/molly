@@ -9,11 +9,11 @@ export class ScraperController {
     private readonly recipeService: RecipesService,
     private readonly scraperService: ScraperService,
   ) {}
+
   @EventPattern('scraper.results.ok')
   async handleScraperOK(@Payload() data: { url: string }): Promise<void> {
     const { url } = data;
     const res = await this.recipeService.getRecipeWithURL(url);
-    await this.recipeService.cacheRecipe(res, url);
     return this.scraperService.sendResult(url, res);
   }
 

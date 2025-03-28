@@ -31,3 +31,9 @@ INSERT INTO recipes(
 
 -- name: GetRecipeByURL :one
 SELECT * FROM recipes WHERE recipe_url=$1;
+
+-- name: GetRecipeByID :one
+SELECT * FROM recipes WHERE id=$1;
+
+-- name: DeleteRecipe :exec
+DELETE FROM recipes WHERE id=$1;
