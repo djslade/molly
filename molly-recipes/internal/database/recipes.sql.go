@@ -11,6 +11,17 @@ import (
 	"github.com/google/uuid"
 )
 
+const countRecipes = `-- name: CountRecipes :one
+SELECT COUNT(id) FROM recipes
+`
+
+func (q *Queries) CountRecipes(ctx context.Context) (int64, error) {
+	row := q.db.QueryRowContext(ctx, countRecipes)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const createRecipe = `-- name: CreateRecipe :one
 INSERT INTO recipes(
     id, 
@@ -147,4 +158,50 @@ func (q *Queries) GetRecipeByURL(ctx context.Context, recipeUrl string) (Recipe,
 		&i.Created,
 	)
 	return i, err
+}
+
+const getRecipes = `-- name: GetRecipes :many
+SELECT id, recipe_url, title, description, cuisine, cooking_method, category, image_url, yields, prep_time_minutes, cook_time_minutes, total_time_minutes, created FROM recipes ORDER BY created DESC LIMIT $1 OFFSET $2
+`
+
+type GetRecipesParams struct {
+	Limit  int32
+	Offset int32
+}
+
+func (q *Queries) GetRecipes(ctx context.Context, arg GetRecipesParams) ([]Recipe, error) {
+	rows, err := q.db.QueryContext(ctx, getRecipes, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Recipe
+	for rows.Next() {
+		var i Recipe
+		if err := rows.Scan(
+			&i.ID,
+			&i.RecipeUrl,
+			&i.Title,
+			&i.Description,
+			&i.Cuisine,
+			&i.CookingMethod,
+			&i.Category,
+			&i.ImageUrl,
+			&i.Yields,
+			&i.PrepTimeMinutes,
+			&i.CookTimeMinutes,
+			&i.TotalTimeMinutes,
+			&i.Created,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }

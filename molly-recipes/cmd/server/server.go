@@ -11,20 +11,17 @@ import (
 	"github.com/google/uuid"
 )
 
-func newServer(db *database.Queries, logger *log.Logger) *server {
-	return &server{db: db, logger: logger}
+func newServer(db *sql.DB, queries *database.Queries, logger *log.Logger) *server {
+	return &server{db: db, queries: queries, logger: logger}
 }
 
 func (srv *server) GetRecipeWithID(ctx context.Context, req *pb.GetRecipeWithIDRequest) (*pb.RecipeResponse, error) {
-	srv.logger.Println("hello")
-	srv.logger.Println(req.GetId())
 	recipeID, err := uuid.Parse(req.GetId())
 	if err != nil {
 		return nil, ErrInvalidRecipeID
 	}
-	srv.logger.Println(recipeID)
 
-	foundRecipe, err := srv.db.GetRecipeByID(ctx, recipeID)
+	foundRecipe, err := srv.queries.GetRecipeByID(ctx, recipeID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, ErrRecipeNotFound
@@ -49,7 +46,7 @@ func (srv *server) GetRecipeWithID(ctx context.Context, req *pb.GetRecipeWithIDR
 		Created:          foundRecipe.Created.String(),
 	}
 
-	foundIngredients, err := srv.db.GetIngredientsByRecipeID(ctx, foundRecipe.ID)
+	foundIngredients, err := srv.queries.GetIngredientsByRecipeID(ctx, foundRecipe.ID)
 	if err != nil {
 		srv.logger.Printf("database error: %v", err.Error())
 		return nil, ErrInternalServerError
@@ -73,7 +70,7 @@ func (srv *server) GetRecipeWithID(ctx context.Context, req *pb.GetRecipeWithIDR
 	}
 	recipe.Ingredients = ingredients
 
-	foundInstructions, err := srv.db.GetInstructionsByRecipeID(ctx, foundRecipe.ID)
+	foundInstructions, err := srv.queries.GetInstructionsByRecipeID(ctx, foundRecipe.ID)
 	if err != nil {
 		srv.logger.Printf("database error: %v", err.Error())
 		return nil, ErrInternalServerError
@@ -81,7 +78,7 @@ func (srv *server) GetRecipeWithID(ctx context.Context, req *pb.GetRecipeWithIDR
 
 	var instructions []*pb.Instruction
 	for _, inst := range foundInstructions {
-		foundTimers, err := srv.db.GetTimersByInstructionID(ctx, inst.ID)
+		foundTimers, err := srv.queries.GetTimersByInstructionID(ctx, inst.ID)
 		if err != nil {
 			srv.logger.Printf("database error: %v", err.Error())
 			return nil, ErrInternalServerError
@@ -119,7 +116,7 @@ func (srv *server) GetRecipeWithURL(ctx context.Context, req *pb.GetRecipeWithUR
 		return nil, ErrInvalidRecipeURL
 	}
 
-	recipe, err := srv.db.GetRecipeByURL(ctx, recipeURL)
+	recipe, err := srv.queries.GetRecipeByURL(ctx, recipeURL)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, ErrRecipeNotFound
@@ -134,6 +131,15 @@ func (srv *server) GetRecipeWithURL(ctx context.Context, req *pb.GetRecipeWithUR
 }
 
 func (srv *server) CreateRecipe(ctx context.Context, req *pb.CreateRecipeRequest) (*pb.RecipeIDResponse, error) {
+	tx, err := srv.db.Begin()
+	if err != nil {
+		srv.logger.Printf("could not begin database transacation: %v\n", err)
+		return nil, ErrInternalServerError
+	}
+	defer tx.Rollback()
+
+	qtx := srv.queries.WithTx(tx)
+
 	reqRecipe := req.GetRecipe()
 
 	recipeURL, err := normalizeUrl(reqRecipe.GetRecipeUrl())
@@ -142,7 +148,7 @@ func (srv *server) CreateRecipe(ctx context.Context, req *pb.CreateRecipeRequest
 		return nil, ErrInvalidRecipeURL
 	}
 
-	recipe, err := srv.db.CreateRecipe(ctx, database.CreateRecipeParams{
+	recipe, err := qtx.CreateRecipe(ctx, database.CreateRecipeParams{
 		RecipeUrl:        recipeURL,
 		Title:            reqRecipe.GetTitle(),
 		Description:      reqRecipe.GetDescription(),
@@ -161,7 +167,7 @@ func (srv *server) CreateRecipe(ctx context.Context, req *pb.CreateRecipeRequest
 	}
 
 	for _, ingredient := range reqRecipe.GetIngredients() {
-		_, err := srv.db.CreateIngredient(ctx, database.CreateIngredientParams{
+		_, err := qtx.CreateIngredient(ctx, database.CreateIngredientParams{
 			RecipeID:        recipe.ID,
 			FullText:        ingredient.GetFullText(),
 			IsOptional:      ingredient.GetIsOptional(),
@@ -179,7 +185,7 @@ func (srv *server) CreateRecipe(ctx context.Context, req *pb.CreateRecipeRequest
 	}
 
 	for _, instruction := range reqRecipe.GetInstructions() {
-		newInstruction, err := srv.db.CreateInstruction(ctx, database.CreateInstructionParams{
+		newInstruction, err := qtx.CreateInstruction(ctx, database.CreateInstructionParams{
 			RecipeID: recipe.ID,
 			Index:    instruction.GetIndex(),
 			FullText: instruction.GetFullText(),
@@ -191,7 +197,7 @@ func (srv *server) CreateRecipe(ctx context.Context, req *pb.CreateRecipeRequest
 		}
 
 		for _, timer := range instruction.GetTimers() {
-			_, err := srv.db.CreateTimer(ctx, database.CreateTimerParams{
+			_, err := qtx.CreateTimer(ctx, database.CreateTimerParams{
 				InstructionID: newInstruction.ID,
 				Unit:          timer.GetUnit(),
 				Value:         timer.GetValue(),
@@ -203,5 +209,48 @@ func (srv *server) CreateRecipe(ctx context.Context, req *pb.CreateRecipeRequest
 		}
 	}
 
+	tx.Commit()
+
 	return &pb.RecipeIDResponse{Id: recipe.ID.String()}, nil
+}
+
+func (srv *server) SearchRecipes(ctx context.Context, req *pb.SearchRecipesRequest) (*pb.RecipesResponse, error) {
+	count, err := srv.queries.CountRecipes(ctx)
+	if err != nil {
+		return nil, ErrInternalServerError
+	}
+
+	var recipes []*pb.Recipe
+
+	if req.GetQuery() == "" {
+		foundRecipes, err := srv.queries.GetRecipes(ctx, database.GetRecipesParams{
+			Limit:  req.GetResultsPerPage(),
+			Offset: req.GetResultsPerPage() * (req.GetPage() - 1),
+		})
+		if err != nil {
+			return nil, ErrInternalServerError
+		}
+		for _, recipe := range foundRecipes {
+			recipes = append(recipes, &pb.Recipe{
+				Id:               recipe.ID.String(),
+				RecipeUrl:        recipe.RecipeUrl,
+				Title:            recipe.Title,
+				Description:      recipe.Description,
+				Cuisine:          recipe.Cuisine,
+				CookingMethod:    recipe.CookingMethod,
+				Category:         recipe.Category,
+				ImageUrl:         recipe.ImageUrl,
+				Yields:           recipe.Yields,
+				PrepTimeMinutes:  recipe.PrepTimeMinutes,
+				CookTimeMinutes:  recipe.CookTimeMinutes,
+				TotalTimeMinutes: recipe.TotalTimeMinutes,
+				Created:          recipe.Created.String(),
+			})
+		}
+	}
+
+	return &pb.RecipesResponse{
+		Total:   int32(count),
+		Recipes: recipes,
+	}, nil
 }

@@ -15,8 +15,9 @@ import (
 
 type server struct {
 	pb.RecipesServiceServer
-	db     *database.Queries
-	logger *log.Logger
+	db      *sql.DB
+	queries *database.Queries
+	logger  *log.Logger
 }
 
 func main() {
@@ -51,7 +52,7 @@ func main() {
 
 	srv := grpc.NewServer()
 
-	pb.RegisterRecipesServiceServer(srv, newServer(queries, logger))
+	pb.RegisterRecipesServiceServer(srv, newServer(db, queries, logger))
 
 	log.Printf("server listening at port %v\n", listener.Addr())
 

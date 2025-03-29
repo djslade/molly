@@ -88,5 +88,6 @@ message SearchRecipesRequest {
 }
 
 message RecipesResponse {
-    repeated Recipe recipes = 1;
+    int32 total = 1;
+    repeated Recipe recipes = 2;
 }

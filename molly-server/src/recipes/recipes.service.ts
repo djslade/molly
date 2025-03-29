@@ -39,6 +39,11 @@ interface IRecipesGRPCService {
     }[];
   }): Observable<any>;
   GetRecipeWithID(data: { id: string }): Observable<any>;
+  SearchRecipes(data: {
+    query: string;
+    page: number;
+    results_per_page: number;
+  }): Observable<any>;
 }
 
 @Injectable()
@@ -62,9 +67,18 @@ export class RecipesService implements OnModuleInit {
     );
   }
 
-  GetRecipeWithID(id: string): Promise<any> {
-    console.log(id);
+  getRecipeWithID(id: string): Promise<any> {
     return lastValueFrom(this.recipesService.GetRecipeWithID({ id }));
+  }
+
+  searchRecipes(query: string, page: number): Promise<any> {
+    return lastValueFrom(
+      this.recipesService.SearchRecipes({
+        query,
+        page,
+        results_per_page: 12,
+      }),
+    );
   }
 
   async cacheRecipe(res: any, url: string) {

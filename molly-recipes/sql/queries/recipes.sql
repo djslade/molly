@@ -35,5 +35,11 @@ SELECT * FROM recipes WHERE recipe_url=$1;
 -- name: GetRecipeByID :one
 SELECT * FROM recipes WHERE id=$1;
 
+-- name: CountRecipes :one
+SELECT COUNT(id) FROM recipes;
+
+-- name: GetRecipes :many
+SELECT * FROM recipes ORDER BY created DESC LIMIT $1 OFFSET $2;
+
 -- name: DeleteRecipe :exec
 DELETE FROM recipes WHERE id=$1;

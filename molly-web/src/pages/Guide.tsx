@@ -12,7 +12,6 @@ export const Guide = () => {
     queryFn: async () => {
       const response = await fetch(`http://localhost:3000/recipes/${id}`);
       const data: GetRecipeResponse = await response.json();
-      console.log(data);
       return data.recipe as Recipe;
     },
   });
@@ -23,7 +22,7 @@ export const Guide = () => {
   return (
     <>
       <Header />
-      <main className="min-h-[calc(100vh-80px)] p-6 bg-violet-50 flex flex-col items-center">
+      <main className="min-h-[calc(100vh-80px)] p-6 bg-amber-50 flex flex-col items-center">
         <GuideModule recipeData={data} />
       </main>
     </>
