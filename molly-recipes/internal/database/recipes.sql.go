@@ -161,16 +161,11 @@ func (q *Queries) GetRecipeByURL(ctx context.Context, recipeUrl string) (Recipe,
 }
 
 const getRecipes = `-- name: GetRecipes :many
-SELECT id, recipe_url, title, description, cuisine, cooking_method, category, image_url, yields, prep_time_minutes, cook_time_minutes, total_time_minutes, created FROM recipes ORDER BY created DESC LIMIT $1 OFFSET $2
+SELECT id, recipe_url, title, description, cuisine, cooking_method, category, image_url, yields, prep_time_minutes, cook_time_minutes, total_time_minutes, created FROM recipes ORDER BY created DESC LIMIT $1
 `
 
-type GetRecipesParams struct {
-	Limit  int32
-	Offset int32
-}
-
-func (q *Queries) GetRecipes(ctx context.Context, arg GetRecipesParams) ([]Recipe, error) {
-	rows, err := q.db.QueryContext(ctx, getRecipes, arg.Limit, arg.Offset)
+func (q *Queries) GetRecipes(ctx context.Context, limit int32) ([]Recipe, error) {
+	rows, err := q.db.QueryContext(ctx, getRecipes, limit)
 	if err != nil {
 		return nil, err
 	}

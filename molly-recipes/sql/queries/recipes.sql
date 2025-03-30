@@ -39,7 +39,7 @@ SELECT * FROM recipes WHERE id=$1;
 SELECT COUNT(id) FROM recipes;
 
 -- name: GetRecipes :many
-SELECT * FROM recipes ORDER BY created DESC LIMIT $1 OFFSET $2;
+SELECT * FROM recipes ORDER BY created DESC LIMIT $1;
 
 -- name: DeleteRecipe :exec
 DELETE FROM recipes WHERE id=$1;

@@ -10,19 +10,22 @@ import { useNavigate } from "react-router";
 export const URLSearch = () => {
   const navigate = useNavigate();
 
+  const [errorMessage, setErrorMessage] = useState<string>("");
+
   const [loading, setLoading] = useState<boolean>(false);
 
   const [recipeURL, setRecipeURL] = useState<string>("");
 
   const changeRecipeURL = (evt: ChangeEvent<HTMLInputElement>): void => {
     if (loading) return;
+    setErrorMessage("");
     setRecipeURL(evt.target.value);
   };
 
   const handleResult = (value: SocketResponse) => {
     try {
       if (!value.id) {
-        throw new Error("oh no!");
+        throw new Error(value.error || "An unknown error occurred");
       }
       navigate(`/recipe/${value.id}`);
     } catch (err) {
@@ -42,7 +45,6 @@ export const URLSearch = () => {
 
   useEffect(() => {
     const onError = (value: SocketResponse) => {
-      console.log(value);
       socket.off(`scrape.${recipeURL}`, handleResult);
       setLoading(false);
     };

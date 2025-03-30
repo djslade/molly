@@ -76,7 +76,7 @@ export class RecipesService implements OnModuleInit {
       this.recipesService.SearchRecipes({
         query,
         page,
-        results_per_page: 12,
+        results_per_page: 6,
       }),
     );
   }

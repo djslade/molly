@@ -22,9 +22,11 @@ export class RecipesController {
   }
 
   @Get()
-  async findAll(@Param('q') query: string, @Param('page') page: number) {
+  async findAll(@Query('q') query: string, @Query('page') page: number) {
     if (!query) query = '';
+    console.log(page);
     if (!page || page < 1) page = 1;
-    return this.recipesService.searchRecipes(query, page);
+    const res = await this.recipesService.searchRecipes(query, page);
+    return res;
   }
 }

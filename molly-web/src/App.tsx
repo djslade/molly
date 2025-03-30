@@ -12,6 +12,8 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route element={<Search />} path="/" />
+          <Route element={<Search />} path="/import" />
+          <Route element={<Search />} path="/search" />
           <Route element={<Recipe />} path="/recipe/:id" />
         </Routes>
       </BrowserRouter>

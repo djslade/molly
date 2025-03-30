@@ -10,15 +10,34 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { SearchRecipesResponse } from "@/types/searchRecipesResponse";
-import { Link, useSearchParams } from "react-router";
+import { Link, useLocation, useNavigate, useSearchParams } from "react-router";
+import InfiniteScroll from "react-infinite-scroll-component";
+import { ClipLoader } from "react-spinners";
 
 export const SearchModule = () => {
+  const { pathname } = useLocation();
+
+  const navigate = useNavigate();
+
   const [params, setParams] = useSearchParams();
 
-  const { isPending, error, data } = useQuery({
+  const handleTabChange = (value: string) => {
+    navigate(value, { replace: true });
+  };
+
+  const handleNextPage = () => {
+    params.set("p", `${parseInt(params.get("p") || "1") + 1}`);
+    setParams(params);
+    refetch();
+  };
+
+  const { isPending, error, data, refetch } = useQuery({
     queryKey: [`recipes`],
+    staleTime: 100,
     queryFn: async () => {
-      const response = await fetch(`http://localhost:3000/recipes`);
+      const response = await fetch(
+        `http://localhost:3000/recipes?page=${params.get("p") || "1"}`
+      );
       const data = await response.json();
       return data as SearchRecipesResponse;
     },
@@ -29,42 +48,60 @@ export const SearchModule = () => {
   if (error) return "Error!" + error.message;
 
   return (
-    <Tabs defaultValue="url" className="max-w-4xl w-full">
+    <Tabs
+      value={pathname === "/" ? "/import" : pathname}
+      className="max-w-4xl w-full"
+    >
       <TabsList className="grid w-full grid-cols-2">
-        <TabsTrigger value="import">With URL</TabsTrigger>
-        <TabsTrigger value="browse">Browse</TabsTrigger>
+        <TabsTrigger value="/import" onClick={() => handleTabChange("/import")}>
+          With URL
+        </TabsTrigger>
+        <TabsTrigger value="/search" onClick={() => handleTabChange("/search")}>
+          Browse
+        </TabsTrigger>
       </TabsList>
-      <TabsContent value="import">
+      <TabsContent value="/import">
         <URLSearch />
       </TabsContent>
-      <TabsContent value="browse">
+      <TabsContent value="/search">
         <Card>
           <CardHeader>
             <CardTitle className="text-xl">Browse recipes</CardTitle>
           </CardHeader>
-          <CardContent className="grid grid-cols-3 gap-3">
-            {data.recipes.map((recipe) => (
-              <Card key={recipe.id} className="flex flex-col justify-between">
-                <img
-                  src={recipe.image_url}
-                  alt=""
-                  className="w-full aspect-square object-cover"
-                />
-                <CardContent>
-                  <CardTitle>{recipe.title}</CardTitle>
-                </CardContent>
-                <CardFooter className="flex items-center justify-between">
-                  <Button variant="secondary">Add to list</Button>
-                  <Link
-                    to={`/recipe/${recipe.id}`}
-                    className={buttonVariants({ variant: "default" })}
-                  >
-                    See more
-                  </Link>
-                </CardFooter>
-              </Card>
-            ))}
-          </CardContent>
+          <InfiniteScroll
+            dataLength={data.recipes.length}
+            hasMore={data.total > data.recipes.length}
+            next={handleNextPage}
+            loader={
+              <div className="w-full text-center pt-8">
+                <ClipLoader />
+              </div>
+            }
+          >
+            <CardContent className="grid grid-cols-3 gap-3">
+              {data.recipes.map((recipe) => (
+                <Card key={recipe.id} className="flex flex-col justify-between">
+                  <img
+                    src={recipe.image_url}
+                    alt=""
+                    className="w-full aspect-square object-cover"
+                  />
+                  <CardContent>
+                    <CardTitle>{recipe.title}</CardTitle>
+                  </CardContent>
+                  <CardFooter className="flex items-center justify-between">
+                    <Button variant="secondary">Add to list</Button>
+                    <Link
+                      to={`/recipe/${recipe.id}`}
+                      className={buttonVariants({ variant: "default" })}
+                    >
+                      See more
+                    </Link>
+                  </CardFooter>
+                </Card>
+              ))}
+            </CardContent>
+          </InfiniteScroll>
         </Card>
       </TabsContent>
     </Tabs>
