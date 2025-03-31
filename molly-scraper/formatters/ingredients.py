@@ -1,6 +1,6 @@
 from recipe import Ingredient
 from ingredient_parser import parse_ingredient
-from .helpers import _is_optional
+from .helpers import _is_optional, format_ingredient_name, format_ingredient_text
 from dataclasses import dataclass
 from fractions import Fraction
 
@@ -66,9 +66,9 @@ def _set_ingredient_size(parsed) -> str:
 def _format_ingredient(raw_ingredient:_RawIngredient) -> Ingredient:
     parsed = parse_ingredient(raw_ingredient.text)
     ingredient = Ingredient(
-        full_text=raw_ingredient.text,
+        full_text=format_ingredient_text(raw_ingredient.text),
         is_optional=_is_optional(raw_ingredient.text),
-        name=_set_ingredient_name(parsed),
+        name=format_ingredient_name(_set_ingredient_name(parsed)),
         quantity=_set_ingredient_quantity(parsed),
         quantity_string=_set_ingredient_quantity_string(parsed),
         unit=_set_ingredient_unit(parsed),

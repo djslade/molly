@@ -1,4 +1,10 @@
-import { HttpCode, Inject, Injectable, OnModuleInit } from '@nestjs/common';
+import {
+  HttpCode,
+  Inject,
+  Injectable,
+  NotFoundException,
+  OnModuleInit,
+} from '@nestjs/common';
 import { ClientGrpc } from '@nestjs/microservices';
 import { Observable, lastValueFrom } from 'rxjs';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
@@ -102,7 +108,7 @@ export class RecipesService implements OnModuleInit {
 
   @HttpCode(404)
   recipeNotFound() {
-    return { status: 'Not found' };
+    throw new NotFoundException({ status: 'Not found' });
   }
 
   @HttpCode(409)

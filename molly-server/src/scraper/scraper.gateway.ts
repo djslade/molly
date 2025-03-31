@@ -32,6 +32,7 @@ export class ScraperGateway
     const { url } = payload;
     if (!url) {
       const res = this.scraperService.newScraperResult(
+        '',
         'Please set a url field',
       );
       this.scraperService.sendErrorMessage(client, res);

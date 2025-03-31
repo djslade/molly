@@ -1,5 +1,5 @@
-import { Recipe } from "./recipe";
+import { RecipeData } from "./recipeData";
 
 export interface GuidePanel {
-  recipeData: Recipe | undefined;
+  recipeData: RecipeData | undefined;
 }

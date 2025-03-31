@@ -14,9 +14,10 @@ export class ScraperService {
     this.clients = this.clients.filter((c) => c.id != client.id);
   }
 
-  newScraperResult(status: string): ScraperResult {
+  newScraperResult(id: string, error: string): ScraperResult {
     const res: ScraperResult = {
-      status,
+      id,
+      error,
     };
     return res;
   }

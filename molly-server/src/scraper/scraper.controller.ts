@@ -13,7 +13,8 @@ export class ScraperController {
   @EventPattern('scraper.results.ok')
   async handleScraperOK(@Payload() data: { url: string }): Promise<void> {
     const { url } = data;
-    const res = await this.recipeService.getRecipeWithURL(url);
+    const recipe = await this.recipeService.getRecipeWithURL(url);
+    const res = this.scraperService.newScraperResult(recipe.id, '');
     return this.scraperService.sendResult(url, res);
   }
 
@@ -24,32 +25,52 @@ export class ScraperController {
   }
 
   @EventPattern('scraper.results.fail')
-  handleScraperFail(@Payload() url: string) {
-    const res = this.scraperService.newScraperResult('Could not scrape recipe');
+  handleScraperFail(@Payload() data: { url: string }) {
+    const { url } = data;
+
+    const res = this.scraperService.newScraperResult(
+      '',
+      "We couldn't import a recipe from this URL",
+    );
     return this.scraperService.sendResult(url, res);
   }
 
   @EventPattern('scraper.results.unknown')
-  handleScraperUnknown(@Payload() url: string) {
-    console.log('An unknown error occurred in the scraper or recipe service.');
-    const res = this.scraperService.newScraperResult('Internal service error');
+  handleScraperUnknown(@Payload() data: { url: string }) {
+    const { url } = data;
+
+    console.error(
+      'An unknown error occurred in the scraper or recipe service.',
+    );
+    const res = this.scraperService.newScraperResult(
+      '',
+      'Oops! Something went wrong with our server',
+    );
     return this.scraperService.sendResult(url, res);
   }
 
   @EventPattern('scraper.results.internal')
-  handleScraperInternalError(@Payload() url: string) {
+  handleScraperInternalError(@Payload() data: { url: string }) {
+    const { url } = data;
+
     console.error(
       'An internal error occurred in the scraper or recipe service.',
     );
-    const res = this.scraperService.newScraperResult('Internal service error');
+    const res = this.scraperService.newScraperResult(
+      '',
+      'Oops! Something went wrong with our server',
+    );
     return this.scraperService.sendResult(url, res);
   }
 
   @EventPattern('scraper.results.unavailable')
-  handleScraperUnavailable(@Payload() url: string) {
+  handleScraperUnavailable(@Payload() data: { url: string }) {
+    const { url } = data;
+
     console.error('The recipe service appears to be unavailable.');
     const res = this.scraperService.newScraperResult(
-      'The recipe service is unavailable',
+      '',
+      "Oops! Looks like this service isn't available right now",
     );
     return this.scraperService.sendResult(url, res);
   }

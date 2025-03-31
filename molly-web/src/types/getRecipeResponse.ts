@@ -1,6 +1,6 @@
-import { Recipe } from "./recipe";
+import { RecipeData } from "./recipeData";
 
 export type GetRecipeResponse = {
   status: string;
-  recipe?: Recipe;
+  recipe?: RecipeData;
 };

@@ -24,16 +24,21 @@ def _abbreviated_recipe(text:str) -> bool:
 def _skippable_step(text:str) -> bool:
     try:
         skippable_rx =r"[\(\[\{\<].*?[\)\]\}\>]"
-        return re.fullmatch(skippable_rx, text) != None
+        if re.fullmatch(skippable_rx, text) != None:
+            return True
+        if text == text.upper():
+            return True
+        if len(text.split(" ")) <= 3:
+            return True
+        return False
     except Exception as err:
-        print(err)
         return False
 
 
 def _remove_rx_matches(pattern:str, text:str):
     try:
         cleaned = text
-        matches = re.findall(pattern, cleaned)
+        matches = re.findall(pattern, cleaned, re.IGNORECASE)
         for match in matches:
             cleaned = cleaned.replace(match, "")
         return cleaned
@@ -60,12 +65,53 @@ def _is_optional(text:str) -> bool:
         return False
 
 
-def _clean_text(text:str) -> str:
-    try:
-        text = _remove_price_info(text)
-        text = text.strip()
-        return text
-    except Exception as err:
-        print(err)
-        return text
-    
+def _remove_asterisks(text:str) -> str:
+    return text.strip().replace("*", "")
+
+
+def _remove_trailing_comma(text:str) -> str:
+    return text.strip().replace("(, ", "(")
+
+
+def _remove_trailing_slash(text:str) -> str:
+    return text.strip().replace(" /", "")
+
+
+def _remove_notes(text:str) -> str:
+    note_rx = r"note \d+"
+    return _remove_rx_matches(note_rx, text)
+
+
+def _remove_empty_paranthesis(text:str) -> str:
+    return text.strip().replace("()", "")
+
+
+def _add_paranthesis(text:str) -> str:
+    counter = 0
+    for c in text:
+        if c == "(":
+            counter += 1
+        if c == ")":
+            counter -= 1
+    stripped = text.strip()
+    if counter > 0:
+        return stripped + ")"
+    if counter < 0:
+        return "(" + stripped
+    return stripped
+
+
+def format_ingredient_name(name:str) -> str:
+    formatted = name.lower()
+    formatted = _remove_price_info(formatted)
+    formatted = _remove_asterisks(formatted)
+    formatted = _remove_trailing_slash(formatted)
+    return formatted
+
+
+def format_ingredient_text(text:str) -> str:
+    formatted = _remove_trailing_comma(text)
+    formatted = _remove_notes(formatted)
+    formatted = _remove_empty_paranthesis(formatted)
+    formatted = _add_paranthesis(formatted)
+    return formatted

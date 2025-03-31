@@ -6,30 +6,54 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Header } from "@/modules/header/Header";
 import { GetRecipeResponse } from "@/types/getRecipeResponse";
 import { toTitleCase } from "@/utils/toTitleCase";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router";
+import { Loading } from "./Loading";
+import { NotFound } from "./NotFound";
 
 export const Recipe = () => {
   const { id } = useParams();
   const { isPending, error, data } = useQuery({
     queryKey: [`recipe-${id}`],
+    retry: false,
     queryFn: async () => {
       const response = await fetch(`http://localhost:3000/recipes/${id}`);
-      const data: GetRecipeResponse = await response.json();
-      return data;
+      if (!response.ok) {
+        throw new Error("Could not get recipe");
+      }
+      const data = await response.json();
+      const res: GetRecipeResponse = {
+        status: data.status || "",
+        recipe: {
+          id: data.recipe.id || "",
+          recipe_url: data.recipe.recipe_url || "",
+          title: data.recipe.title || "",
+          description: data.recipe.description || "",
+          cooking_method: data.recipe.cooking_method || "",
+          cuisine: data.recipe.cuisine || "",
+          category: data.recipe.category || "",
+          image_url: data.recipe.image_url || "",
+          yields: data.recipe.yields || "",
+          prep_time_minutes: data.recipe.prep_time_minutes || 0,
+          cook_time_minutes: data.recipe.cook_time_minutes || 0,
+          total_time_minutes: data.recipe.total_time_minutes || 0,
+          ingredients: data.recipe.ingredients || [],
+          instructions: data.recipe.instructions || [],
+          created: data.recipe.created || "",
+        },
+      };
+      return res;
     },
   });
 
-  if (isPending) return "Loading...";
+  if (isPending) return <Loading />;
 
-  if (error) return "Error!" + error.message;
+  if (error) return <NotFound />;
 
   return (
     <>
-      <Header />
       <main className="min-h-[calc(100vh-80px)] p-6 bg-amber-50 flex flex-col items-center">
         <Card className="max-w-4xl w-full">
           <CardHeader className="w-full grid-cols-6 grid gap-6">
@@ -93,9 +117,9 @@ export const Recipe = () => {
                       key={ingredient.id}
                       className="flex flex-col gap-2 py-1"
                     >
-                      <CardDescription className="text-md">
+                      <p className="text-md text-neutral-500">
                         {ingredient.full_text}
-                      </CardDescription>
+                      </p>
                     </div>
                   ))}
                 </div>

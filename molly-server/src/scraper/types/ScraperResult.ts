@@ -1,3 +1,4 @@
 export interface ScraperResult {
-  status: string;
+  id: string;
+  error: string;
 }

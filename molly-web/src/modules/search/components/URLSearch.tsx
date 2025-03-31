@@ -29,7 +29,9 @@ export const URLSearch = () => {
       }
       navigate(`/recipe/${value.id}`);
     } catch (err) {
-      console.log(err);
+      if (err instanceof Error) {
+        setErrorMessage(err.message);
+      }
     } finally {
       socket.off(`scrape.${recipeURL}`, handleResult);
       setLoading(false);
@@ -45,6 +47,7 @@ export const URLSearch = () => {
 
   useEffect(() => {
     const onError = (value: SocketResponse) => {
+      setErrorMessage(value.error || "An unknown error occurred");
       socket.off(`scrape.${recipeURL}`, handleResult);
       setLoading(false);
     };
@@ -60,21 +63,24 @@ export const URLSearch = () => {
     <Card className="w-full">
       <CardContent className="flex flex-col gap-6">
         <CardTitle className="text-xl">Search with URL</CardTitle>
-        <div className="flex w-full items-center space-x-2">
-          <Input
-            disabled={loading}
-            type="url"
-            placeholder="Recipe URL"
-            value={recipeURL}
-            onChange={changeRecipeURL}
-          />
-          <Button
-            onClick={onSubmit}
-            disabled={loading}
-            className="disabled:bg-amber-500"
-          >
-            {loading ? <ClipLoader size={20} color="#f5f3ff" /> : "Search"}
-          </Button>
+        <div className="">
+          <div className="flex w-full items-center space-x-2">
+            <Input
+              disabled={loading}
+              type="url"
+              placeholder="Recipe URL"
+              value={recipeURL}
+              onChange={changeRecipeURL}
+            />
+            <Button
+              onClick={onSubmit}
+              disabled={loading}
+              className="disabled:bg-amber-500"
+            >
+              {loading ? <ClipLoader size={20} color="#f5f3ff" /> : "Search"}
+            </Button>
+          </div>
+          <span className="text-red-500">{errorMessage}</span>
         </div>
       </CardContent>
     </Card>

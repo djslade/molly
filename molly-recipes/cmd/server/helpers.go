@@ -20,7 +20,9 @@ func normalizeUrl(s string) (string, error) {
 		return "", errInvalidUrl
 	}
 
-	normalized := parsed.Host + parsed.Path
-
+	normalized := strings.ToLower(parsed.Host + parsed.Path)
+	if !strings.HasPrefix(normalized, "www.") {
+		normalized = "www." + normalized
+	}
 	return strings.ToLower(path.Clean(normalized)), nil
 }

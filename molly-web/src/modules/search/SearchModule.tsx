@@ -3,6 +3,7 @@ import { URLSearch } from "./components/URLSearch";
 import {
   Card,
   CardContent,
+  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
@@ -13,6 +14,13 @@ import { SearchRecipesResponse } from "@/types/searchRecipesResponse";
 import { Link, useLocation, useNavigate, useSearchParams } from "react-router";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { ClipLoader } from "react-spinners";
+import { toTitleCase } from "@/utils/toTitleCase";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export const SearchModule = () => {
   const { pathname } = useLocation();
@@ -39,7 +47,11 @@ export const SearchModule = () => {
         `http://localhost:3000/recipes?page=${params.get("p") || "1"}`
       );
       const data = await response.json();
-      return data as SearchRecipesResponse;
+      const res: SearchRecipesResponse = {
+        total: data.total || 0,
+        recipes: data.recipes || [],
+      };
+      return res;
     },
   });
 
@@ -79,6 +91,9 @@ export const SearchModule = () => {
             }
           >
             <CardContent className="grid grid-cols-3 gap-3">
+              {data.recipes.length === 0 && (
+                <CardDescription>There are no results</CardDescription>
+              )}
               {data.recipes.map((recipe) => (
                 <Card key={recipe.id} className="flex flex-col justify-between">
                   <img
@@ -87,10 +102,21 @@ export const SearchModule = () => {
                     className="w-full aspect-square object-cover"
                   />
                   <CardContent>
-                    <CardTitle>{recipe.title}</CardTitle>
+                    <CardTitle>{toTitleCase(recipe.title || "")}</CardTitle>
                   </CardContent>
                   <CardFooter className="flex items-center justify-between">
-                    <Button variant="secondary">Add to list</Button>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button variant="secondary">
+                            Add to list
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Coming soon!</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                     <Link
                       to={`/recipe/${recipe.id}`}
                       className={buttonVariants({ variant: "default" })}

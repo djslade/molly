@@ -1,7 +1,6 @@
 import { GuideModule } from "@/modules/guide/GuideModule";
-import { Header } from "@/modules/header/Header";
 import { GetRecipeResponse } from "@/types/getRecipeResponse";
-import { Recipe } from "@/types/recipe";
+import { RecipeData } from "@/types/recipeData";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router";
 
@@ -12,7 +11,7 @@ export const Guide = () => {
     queryFn: async () => {
       const response = await fetch(`http://localhost:3000/recipes/${id}`);
       const data: GetRecipeResponse = await response.json();
-      return data.recipe as Recipe;
+      return data.recipe as RecipeData;
     },
   });
 
@@ -21,7 +20,6 @@ export const Guide = () => {
   if (error) return "Error!" + error.message;
   return (
     <>
-      <Header />
       <main className="min-h-[calc(100vh-80px)] p-6 bg-amber-50 flex flex-col items-center">
         <GuideModule recipeData={data} />
       </main>

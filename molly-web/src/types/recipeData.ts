@@ -30,7 +30,7 @@ export type Ingredient = {
   created: string;
 };
 
-export type Recipe = {
+export type RecipeData = {
   id: string;
   recipe_url: string;
   title?: string;

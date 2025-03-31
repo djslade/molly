@@ -1,6 +1,6 @@
-import { Recipe } from "./recipe";
+import { RecipeData } from "./recipeData";
 
 export type SearchRecipesResponse = {
   total: number;
-  recipes: Recipe[];
+  recipes: RecipeData[];
 };
