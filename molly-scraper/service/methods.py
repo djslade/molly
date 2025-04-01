@@ -6,6 +6,7 @@ import grpc
 from protoc import RecipesServiceStub
 import json
 import exceptions
+import os
 
 
 def _set_optional_field(fn, fallback):
@@ -42,7 +43,10 @@ def new_recipe(url:str) -> Recipe:
 
 
 def new_invoker() -> Invoker:
-    grpc_channel = grpc.insecure_channel("localhost:8080")
+    conn = os.getenv("RECIPES_CONN")
+    if conn == "":
+        conn = "localhost:8080"
+    grpc_channel = grpc.insecure_channel(conn)
     stub = RecipesServiceStub(grpc_channel)
     invoker = Invoker(stub=stub)
     return invoker
