@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 
 export const Home = () => {
   return (
-    <main className="min-h-[calc(100vh-80px)] p-6 bg-amber-300 flex flex-col justify-center bg-[url('/home.webp')] bg-center bg-no-repeat relative">
+    <main className="min-h-[calc(100vh-80px)] bg-amber-300 flex flex-col justify-center bg-[url('/home.webp')] bg-center bg-no-repeat relative py-6 px-3">
       <div className="absolute bg-black inset-0 opacity-60"></div>
       <section className="flex flex-col w-full gap-12 items-center relative">
         <div className="flex flex-col w-full gap-6 text-amber-50">

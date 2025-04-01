@@ -10,7 +10,7 @@ import { RecipesModule } from 'src/recipes/recipes.module';
         name: 'SCRAPER_REQUESTS',
         transport: Transport.RMQ,
         options: {
-          urls: ['amqp://localhost:5672'],
+          urls: [process.env.RMQ_CONN || 'amqp://localhost:5672'],
           queue: 'scraper.requests',
           queueOptions: { durable: false },
         },

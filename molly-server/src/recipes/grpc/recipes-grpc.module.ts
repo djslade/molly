@@ -9,7 +9,7 @@ import { join } from 'path';
         name: 'RECIPE_GRPC_SERVICE',
         transport: Transport.GRPC,
         options: {
-          url: 'localhost:8080',
+          url: process.env.RECIPES_CONN || 'localhost:8080',
           package: 'recipes',
           protoPath: join(__dirname, 'recipes.proto'),
           loader: {

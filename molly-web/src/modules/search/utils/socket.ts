@@ -1,5 +1,6 @@
+import { getServerURL } from "@/utils/getServerUrl";
 import { io } from "socket.io-client";
 
-const URL = "http://localhost:3000";
+const URL = getServerURL();
 
 export const socket = io(URL);

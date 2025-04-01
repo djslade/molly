@@ -7,7 +7,7 @@ import {
 
 export const NotFound = () => {
   return (
-    <main className="min-h-[calc(100vh-80px)] p-6 bg-amber-50 flex flex-col items-center">
+    <main className="min-h-[calc(100vh-80px)] bg-amber-50 flex flex-col items-center py-6 px-3">
       <Card className="max-w-4xl w-full">
         <CardContent className="flex flex-col gap-3  ">
           <CardTitle className="text-xl">Page not found</CardTitle>

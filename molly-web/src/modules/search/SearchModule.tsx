@@ -21,6 +21,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { getServerURL } from "@/utils/getServerUrl";
 
 export const SearchModule = () => {
   const { pathname } = useLocation();
@@ -44,7 +45,7 @@ export const SearchModule = () => {
     staleTime: 100,
     queryFn: async () => {
       const response = await fetch(
-        `http://localhost:3000/recipes?page=${params.get("p") || "1"}`
+        `${getServerURL()}/recipes?page=${params.get("p") || "1"}`
       );
       const data = await response.json();
       const res: SearchRecipesResponse = {
@@ -90,7 +91,7 @@ export const SearchModule = () => {
               </div>
             }
           >
-            <CardContent className="grid grid-cols-3 gap-3">
+            <CardContent className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
               {data.recipes.length === 0 && (
                 <CardDescription>There are no results</CardDescription>
               )}
@@ -108,9 +109,7 @@ export const SearchModule = () => {
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <Button variant="secondary">
-                            Add to list
-                          </Button>
+                          <Button variant="secondary">Add to list</Button>
                         </TooltipTrigger>
                         <TooltipContent>
                           <p>Coming soon!</p>
