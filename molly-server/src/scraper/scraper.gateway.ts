@@ -4,7 +4,7 @@ import {
   OnGatewayDisconnect,
   SubscribeMessage,
 } from '@nestjs/websockets';
-import { Server, Socket } from 'socket.io';
+import { Socket } from 'socket.io';
 import { RecipesService } from 'src/recipes/recipes.service';
 import { PubsubService } from 'src/pubsub/pubsub.service';
 import { ScraperService } from './scraper.service';
