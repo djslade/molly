@@ -10,6 +10,7 @@ import { SearchRecipesResponseDto } from './dtos/searchRecipesResponse';
 import { RecipeResponseDto } from './dtos/recipeResponse';
 import { plainToInstance } from 'class-transformer';
 import { GrpcMethodExceptionFilter } from 'src/common/grpc/grpc.filter';
+import { handleGrpcException } from 'src/common/grpc/handle-rpc-exception.util';
 
 interface IRecipesGRPCService {
   GetRecipeWithURL(data: GetRecipeWithURLRequestDto): Observable<any>;
@@ -33,30 +34,38 @@ export class RecipesService implements OnModuleInit {
   }
 
   @UseFilters(new GrpcMethodExceptionFilter())
-  async getRecipeWithURL(request: GetRecipeWithURLRequestDto): Promise<any> {
-    console.log('hi');
-    const res = await lastValueFrom(
-      this.recipesService.GetRecipeWithURL(request),
-    );
-    return res;
+  async getRecipeWithURL(request: GetRecipeWithURLRequestDto) {
+    try {
+      const res = await lastValueFrom(
+        this.recipesService.GetRecipeWithURL(request),
+      );
+      return res;
+    } catch (err) {
+      throw handleGrpcException(err);
+    }
   }
 
   @UseFilters(new GrpcMethodExceptionFilter())
-  async getRecipeWithID(
-    request: GetRecipeWithIDRequestDto,
-  ): Promise<RecipeResponseDto> {
-    const res = await lastValueFrom(
-      this.recipesService.GetRecipeWithID(request),
-    );
-    return plainToInstance(RecipeResponseDto, res);
+  async getRecipeWithID(request: GetRecipeWithIDRequestDto) {
+    try {
+      const res = await lastValueFrom(
+        this.recipesService.GetRecipeWithID(request),
+      );
+      return plainToInstance(RecipeResponseDto, res);
+    } catch (err) {
+      throw handleGrpcException(err);
+    }
   }
 
-  @UseFilters(new GrpcMethodExceptionFilter())
-  async searchRecipes(
-    request: SearchRecipesRequestDto,
-  ): Promise<SearchRecipesResponseDto> {
-    const res = await lastValueFrom(this.recipesService.SearchRecipes(request));
-    return plainToInstance(SearchRecipesResponseDto, res);
+  async searchRecipes(request: SearchRecipesRequestDto) {
+    try {
+      const res = await lastValueFrom(
+        this.recipesService.SearchRecipes(request),
+      );
+      return plainToInstance(SearchRecipesResponseDto, res);
+    } catch (err) {
+      throw handleGrpcException(err);
+    }
   }
 
   async cacheRecipe(res: RecipeResponseDto, url: string) {

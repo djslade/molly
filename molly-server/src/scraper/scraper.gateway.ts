@@ -10,6 +10,8 @@ import { PubsubService } from 'src/pubsub/pubsub.service';
 import { ScraperService } from './scraper.service';
 import { GrpcNotFoundException } from 'src/common/grpc/grpc-exceptions';
 import { RecipeUrlDto } from 'src/common/dtos/recipeUrlDto';
+import { UseFilters, UsePipes, ValidationPipe } from '@nestjs/common';
+import { ScraperWsExceptionFilter } from './scraper-ws.filter';
 
 @WebSocketGateway({ cors: true })
 export class ScraperGateway
@@ -29,13 +31,14 @@ export class ScraperGateway
     this.scraperService.onClientDisconnect(client);
   }
 
+  @UsePipes(new ValidationPipe({ transform: true }))
+  @UseFilters(new ScraperWsExceptionFilter())
   @SubscribeMessage('scrape.request')
   async handleScrapeRequest(client: Socket, payload: RecipeUrlDto) {
     try {
       const res = await this.recipesService.getRecipeWithURL(payload);
       this.scraperService.sendResult(payload.recipe_url, res);
     } catch (err) {
-      console.log('yellow');
       if (err instanceof GrpcNotFoundException) {
         this.pubsubService.sendScraperRequest(payload);
         return;

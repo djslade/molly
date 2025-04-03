@@ -11,12 +11,10 @@ export class RecipesController {
   @Get(':id')
   @UseFilters(new RpcToHttpExceptionFilter())
   async findOne(@Param() request: GetRecipeWithIDRequestDto) {
-    console.log('1');
     const cached = await this.recipesService.checkCache(request.id);
     if (cached !== null) {
       return cached;
     }
-    console.log('2');
     const res = await this.recipesService.getRecipeWithID(request);
     await this.recipesService.cacheRecipe(res, request.id);
     return res;
