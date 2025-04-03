@@ -8,7 +8,7 @@ export class PubsubService {
     @Inject('SCRAPER_REQUESTS') private readonly scraperRequests: ClientProxy,
   ) {}
 
-  async sendScraperRequest(request: ScraperRequestDto) {
+  sendScraperRequest(request: ScraperRequestDto) {
     try {
       return this.scraperRequests.emit('scraper.requests', request);
     } catch (err) {

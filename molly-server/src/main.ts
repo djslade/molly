@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { ValidationPipe } from '@nestjs/common';
+import { MollyValidationPipe } from './common/validation/molly-validation.pipe';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -17,17 +18,10 @@ async function bootstrap() {
 
   app.enableCors();
 
-  app.useGlobalPipes(
-    new ValidationPipe({
-      transform: true,
-      transformOptions: {
-        enableImplicitConversion: true,
-      },
-    }),
-  );
+  app.useGlobalPipes(new MollyValidationPipe());
 
   await app.startAllMicroservices();
   await app.listen(process.env.PORT ?? 3000);
 }
 
-bootstrap();
+void bootstrap();

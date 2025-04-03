@@ -1,4 +1,4 @@
-import { Inject, Injectable, OnModuleInit, UseFilters } from '@nestjs/common';
+import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { ClientGrpc } from '@nestjs/microservices';
 import { Observable, lastValueFrom } from 'rxjs';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
@@ -9,8 +9,8 @@ import { SearchRecipesRequestDto } from './dtos/searchRecipesRequest';
 import { SearchRecipesResponseDto } from './dtos/searchRecipesResponse';
 import { RecipeResponseDto } from './dtos/recipeResponse';
 import { plainToInstance } from 'class-transformer';
-import { GrpcMethodExceptionFilter } from 'src/common/grpc/grpc.filter';
 import { handleGrpcException } from 'src/common/grpc/handle-rpc-exception.util';
+import { RecipeIdResponseDto } from './dtos/recipeIdResponseDto';
 
 interface IRecipesGRPCService {
   GetRecipeWithURL(data: GetRecipeWithURLRequestDto): Observable<any>;
@@ -33,38 +33,38 @@ export class RecipesService implements OnModuleInit {
       this.client.getService<IRecipesGRPCService>('RecipesService');
   }
 
-  @UseFilters(new GrpcMethodExceptionFilter())
-  async getRecipeWithURL(request: GetRecipeWithURLRequestDto) {
+  async getRecipeWithURL(
+    request: GetRecipeWithURLRequestDto,
+  ): Promise<RecipeIdResponseDto> {
     try {
-      const res = await lastValueFrom(
-        this.recipesService.GetRecipeWithURL(request),
+      return plainToInstance(
+        RecipeIdResponseDto,
+        await lastValueFrom(this.recipesService.GetRecipeWithURL(request)),
       );
-      return res;
     } catch (err) {
-      throw handleGrpcException(err);
+      throw handleGrpcException(err as Error);
     }
   }
 
-  @UseFilters(new GrpcMethodExceptionFilter())
   async getRecipeWithID(request: GetRecipeWithIDRequestDto) {
     try {
-      const res = await lastValueFrom(
-        this.recipesService.GetRecipeWithID(request),
+      return plainToInstance(
+        RecipeResponseDto,
+        await lastValueFrom(this.recipesService.GetRecipeWithID(request)),
       );
-      return plainToInstance(RecipeResponseDto, res);
     } catch (err) {
-      throw handleGrpcException(err);
+      throw handleGrpcException(err as Error);
     }
   }
 
   async searchRecipes(request: SearchRecipesRequestDto) {
     try {
-      const res = await lastValueFrom(
-        this.recipesService.SearchRecipes(request),
+      return plainToInstance(
+        SearchRecipesResponseDto,
+        await lastValueFrom(this.recipesService.SearchRecipes(request)),
       );
-      return plainToInstance(SearchRecipesResponseDto, res);
     } catch (err) {
-      throw handleGrpcException(err);
+      throw handleGrpcException(err as Error);
     }
   }
 
@@ -77,7 +77,7 @@ export class RecipesService implements OnModuleInit {
     }
   }
 
-  async checkCache(id: string): Promise<any> {
+  async checkCache(id: string): Promise<RecipeResponseDto | null> {
     const key = `recipe.${id}`;
     return await this.cacheManager.get(key);
   }

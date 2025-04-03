@@ -4,6 +4,9 @@ interface ErrorObject {
   details?: string;
 }
 
-export const isErrorObject = (error: any): error is ErrorObject => {
-  return error.code !== undefined;
+export const isErrorObject = (error: object | string): error is ErrorObject => {
+  if (typeof error === 'string') return false;
+  if (!error['code']) return false;
+  if (typeof error['code'] !== 'number') return false;
+  return true;
 };
