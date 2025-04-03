@@ -43,9 +43,7 @@ def new_recipe(url:str) -> Recipe:
 
 
 def new_invoker() -> Invoker:
-    conn = os.getenv("RECIPES_CONN")
-    if conn == "":
-        conn = "localhost:8080"
+    conn = os.getenv("RECIPES_CONN", "localhost:8080")
     grpc_channel = grpc.insecure_channel(conn)
     stub = RecipesServiceStub(grpc_channel)
     invoker = Invoker(stub=stub)

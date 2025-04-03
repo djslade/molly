@@ -10,7 +10,7 @@ import { PubsubService } from 'src/pubsub/pubsub.service';
 import { ScraperService } from './scraper.service';
 import { GrpcNotFoundException } from 'src/common/grpc/grpc-exceptions';
 import { RecipeUrlDto } from 'src/common/dtos/recipeUrlDto';
-import { UseFilters, UsePipes, ValidationPipe } from '@nestjs/common';
+import { UseFilters, UsePipes } from '@nestjs/common';
 import { ScraperWsExceptionFilter } from './scraper-ws.filter';
 import { MollyValidationPipe } from 'src/common/validation/molly-validation.pipe';
 
