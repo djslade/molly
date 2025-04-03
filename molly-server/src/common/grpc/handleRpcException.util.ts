@@ -1,7 +1,7 @@
 import { status as GrpcStatus } from '@grpc/grpc-js';
 import { GrpcNotFoundException } from './grpc-exceptions';
 import { RpcException } from '@nestjs/microservices';
-import { isErrorObject } from './is-error-object.util';
+import { isErrorObject } from './isErrorObject.util';
 
 export const handleGrpcException = (exception: Error) => {
   const err = {

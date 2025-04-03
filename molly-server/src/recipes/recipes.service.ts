@@ -1,6 +1,6 @@
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { ClientGrpc } from '@nestjs/microservices';
-import { Observable, lastValueFrom } from 'rxjs';
+import { lastValueFrom } from 'rxjs';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 import { GetRecipeWithURLRequestDto } from './dtos/getRecipeWithURLRequest';
@@ -9,14 +9,9 @@ import { SearchRecipesRequestDto } from './dtos/searchRecipesRequest';
 import { SearchRecipesResponseDto } from './dtos/searchRecipesResponse';
 import { RecipeResponseDto } from './dtos/recipeResponse';
 import { plainToInstance } from 'class-transformer';
-import { handleGrpcException } from 'src/common/grpc/handle-rpc-exception.util';
+import { handleGrpcException } from 'src/common/grpc/handleRpcException.util';
 import { RecipeIdResponseDto } from './dtos/recipeIdResponseDto';
-
-interface IRecipesGRPCService {
-  GetRecipeWithURL(data: GetRecipeWithURLRequestDto): Observable<any>;
-  GetRecipeWithID(data: GetRecipeWithIDRequestDto): Observable<any>;
-  SearchRecipes(data: SearchRecipesRequestDto): Observable<any>;
-}
+import { IRecipesGRPCService } from './interfaces/recipesGrpcService';
 
 @Injectable()
 export class RecipesService implements OnModuleInit {

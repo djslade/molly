@@ -6,8 +6,8 @@ import {
 } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
 import { Response } from 'express';
-import { convertGRPCToHTTP } from './convert-grpc-to-http.util';
-import { isErrorObject } from './is-error-object.util';
+import { convertGRPCToHTTP } from './convertGrpcToHttp.util';
+import { isErrorObject } from './isErrorObject.util';
 
 @Catch(RpcException)
 export class RpcToHttpExceptionFilter implements ExceptionFilter<RpcException> {

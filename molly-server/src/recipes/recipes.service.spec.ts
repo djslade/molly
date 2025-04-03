@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { RecipesService } from './recipes.service';
 import { CacheModule } from '@nestjs/cache-manager';
-import { RecipeGRPCModule } from './grpc/recipes-grpc.module';
+import { RecipeGRPCModule } from './grpc/recipesGrpc.module';
 import { RecipesController } from './recipes.controller';
 
 describe('RecipesService', () => {

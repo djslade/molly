@@ -5,7 +5,7 @@ import {
   ExceptionFilter,
 } from '@nestjs/common';
 import { ScraperResult } from './types/ScraperResult';
-import { isErrorObject } from 'src/common/grpc/is-error-object.util';
+import { isErrorObject } from 'src/common/grpc/isErrorObject.util';
 import { Socket } from 'socket.io';
 
 @Catch(BadRequestException)

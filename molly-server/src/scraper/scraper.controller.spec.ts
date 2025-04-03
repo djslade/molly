@@ -4,6 +4,7 @@ import { ScraperService } from './scraper.service';
 import { GetRecipeWithURLRequestDto } from 'src/recipes/dtos/getRecipeWithURLRequest';
 import { RecipesService } from 'src/recipes/recipes.service';
 import { ScraperResult } from './types/ScraperResult';
+import { RecipeIdResponseDto } from 'src/recipes/dtos/recipeIdResponseDto';
 
 describe('ScraperController', () => {
   let controller: ScraperController;
@@ -13,12 +14,12 @@ describe('ScraperController', () => {
   beforeEach(async () => {
     mockRecipesService = {
       getRecipeWithURL: jest.fn(),
-    } as any;
+    } as unknown as jest.Mocked<RecipesService>;
 
     mockScraperService = {
       newScraperResult: jest.fn(),
       sendResult: jest.fn(),
-    } as any;
+    } as unknown as jest.Mocked<ScraperService>;
 
     const module: TestingModule = await Test.createTestingModule({
       controllers: [ScraperController],
@@ -48,9 +49,9 @@ describe('ScraperController', () => {
 
     const testPayload: ScraperResult = { id: 'recipe123', error: '' };
 
-    const mockRecipe = { id: 'recipe123' };
+    const mockRecipe: RecipeIdResponseDto = { id: 'recipe123' };
 
-    mockRecipesService.getRecipeWithURL.mockResolvedValue(mockRecipe as any);
+    mockRecipesService.getRecipeWithURL.mockResolvedValue(mockRecipe);
     mockScraperService.newScraperResult.mockReturnValue(testPayload);
 
     await controller.handleScraperOK(testData);

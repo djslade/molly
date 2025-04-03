@@ -2,7 +2,7 @@ import { Controller, Get, Param, Query, UseFilters } from '@nestjs/common';
 import { RecipesService } from './recipes.service';
 import { SearchRecipesRequestDto } from './dtos/searchRecipesRequest';
 import { GetRecipeWithIDRequestDto } from './dtos/getRecipeWithIDRequest';
-import { RpcToHttpExceptionFilter } from '../common/grpc/rpc-to-http.filter';
+import { RpcToHttpExceptionFilter } from '../common/grpc/rpcToHttp.filter';
 
 @Controller('recipes')
 export class RecipesController {

@@ -7,11 +7,13 @@ export class ScraperService {
   private clients: Socket[] = [];
 
   onClientConnection(client: Socket) {
-    this.clients.push(client);
+    if (this.clients.filter((c) => c.id === client.id).length === 0) {
+      this.clients.push(client);
+    }
   }
 
   onClientDisconnect(client: Socket) {
-    this.clients = this.clients.filter((c) => c.id != client.id);
+    this.clients = this.clients.filter((c) => c.id !== client.id);
   }
 
   newScraperResult(id: string, error: string): ScraperResult {
