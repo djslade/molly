@@ -25,11 +25,17 @@ I will update this section as more features are implemented.
 
 ## Quick Start
 
-Coming soon!
+Click [here](https://molly.davidslade.dev/) to visit the live demo.
 
 ## Usage
 
-Coming soon!
+### Import recipes
+
+Importing recipes is easy. Head over to your favorite recipe blog, find something you like, and paste the link into the form. Molly will declutter the recipe and leave you with just the important parts.
+
+### Browsing
+
+Recipes you import will be saved into the catalogue for everyone else, so in that way Molly is an aggregator that anyone can contribute to.
 
 ## Developers
 
