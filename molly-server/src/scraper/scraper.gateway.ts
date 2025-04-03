@@ -8,6 +8,8 @@ import { Socket } from 'socket.io';
 import { RecipesService } from 'src/recipes/recipes.service';
 import { PubsubService } from 'src/pubsub/pubsub.service';
 import { ScraperService } from './scraper.service';
+import { GrpcNotFoundException } from 'src/common/grpc/grpc-exceptions';
+import { RecipeUrlDto } from 'src/common/dtos/recipeUrlDto';
 
 @WebSocketGateway({ cors: true })
 export class ScraperGateway
@@ -28,21 +30,17 @@ export class ScraperGateway
   }
 
   @SubscribeMessage('scrape.request')
-  async handleScrapeRequest(client: Socket, payload: { url: string }) {
-    const { url } = payload;
-    if (!url) {
-      const res = this.scraperService.newScraperResult(
-        '',
-        'Please set a url field',
-      );
-      this.scraperService.sendErrorMessage(client, res);
-      return;
-    }
+  async handleScrapeRequest(client: Socket, payload: RecipeUrlDto) {
     try {
-      const res = await this.recipesService.getRecipeWithURL(url);
-      this.scraperService.sendResult(url, res);
+      const res = await this.recipesService.getRecipeWithURL(payload);
+      this.scraperService.sendResult(payload.recipe_url, res);
     } catch (err) {
-      this.pubsubService.sendScraperRequest({ url });
+      console.log('yellow');
+      if (err instanceof GrpcNotFoundException) {
+        this.pubsubService.sendScraperRequest(payload);
+        return;
+      }
+      client.emit('error', { error: err.details });
     }
   }
 }

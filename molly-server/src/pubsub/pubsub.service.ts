@@ -1,5 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
+import { ScraperRequestDto } from './dtos/scraperRequest';
 
 @Injectable()
 export class PubsubService {
@@ -7,9 +8,9 @@ export class PubsubService {
     @Inject('SCRAPER_REQUESTS') private readonly scraperRequests: ClientProxy,
   ) {}
 
-  async sendScraperRequest(data: any) {
+  async sendScraperRequest(request: ScraperRequestDto) {
     try {
-      return this.scraperRequests.emit('scraper.requests', data);
+      return this.scraperRequests.emit('scraper.requests', request);
     } catch (err) {
       console.error(err);
     }

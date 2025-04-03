@@ -14,7 +14,6 @@ import { SearchRecipesResponse } from "@/types/searchRecipesResponse";
 import { Link, useLocation, useNavigate, useSearchParams } from "react-router";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { ClipLoader } from "react-spinners";
-import { toTitleCase } from "@/utils/toTitleCase";
 import {
   Tooltip,
   TooltipContent,
@@ -48,9 +47,10 @@ export const SearchModule = () => {
         `${getServerURL()}/recipes?page=${params.get("p") || "1"}`
       );
       const data = await response.json();
+      console.log(data);
       const res: SearchRecipesResponse = {
-        total: data.total || 0,
-        recipes: data.recipes || [],
+        total: data.total,
+        recipes: data.recipes,
       };
       return res;
     },
@@ -98,12 +98,12 @@ export const SearchModule = () => {
               {data.recipes.map((recipe) => (
                 <Card key={recipe.id} className="flex flex-col justify-between">
                   <img
-                    src={recipe.image_url}
+                    src={recipe.imageURL}
                     alt=""
                     className="w-full aspect-square object-cover"
                   />
                   <CardContent>
-                    <CardTitle>{toTitleCase(recipe.title || "")}</CardTitle>
+                    <CardTitle>{recipe.title}</CardTitle>
                   </CardContent>
                   <CardFooter className="flex items-center justify-between">
                     <TooltipProvider>

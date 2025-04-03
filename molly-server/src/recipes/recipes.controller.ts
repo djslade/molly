@@ -1,31 +1,31 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import { Controller, Get, Param, Query, UseFilters } from '@nestjs/common';
 import { RecipesService } from './recipes.service';
-import { cachedDataVersionTag } from 'v8';
+import { SearchRecipesRequestDto } from './dtos/searchRecipesRequest';
+import { GetRecipeWithIDRequestDto } from './dtos/getRecipeWithIDRequest';
+import { RpcToHttpExceptionFilter } from '../common/grpc/rpc-to-http.filter';
 
 @Controller('recipes')
 export class RecipesController {
   constructor(private readonly recipesService: RecipesService) {}
 
   @Get(':id')
-  async findOne(@Param('id') id: string) {
-    const cached = await this.recipesService.checkCache(id);
+  @UseFilters(new RpcToHttpExceptionFilter())
+  async findOne(@Param() request: GetRecipeWithIDRequestDto) {
+    console.log('1');
+    const cached = await this.recipesService.checkCache(request.id);
     if (cached !== null) {
-      return this.recipesService.recipeFound(cached.recipe);
+      return cached;
     }
-    try {
-      const res = await this.recipesService.getRecipeWithID(id);
-      await this.recipesService.cacheRecipe(res, id);
-      return this.recipesService.recipeFound(res.recipe);
-    } catch (err) {
-      return this.recipesService.recipeNotFound();
-    }
+    console.log('2');
+    const res = await this.recipesService.getRecipeWithID(request);
+    await this.recipesService.cacheRecipe(res, request.id);
+    return res;
   }
 
   @Get()
-  async findAll(@Query('q') query: string, @Query('page') page: number) {
-    if (!query) query = '';
-    if (!page || page < 1) page = 1;
-    const res = await this.recipesService.searchRecipes(query, page);
+  @UseFilters(new RpcToHttpExceptionFilter())
+  async findAll(@Query() queryParams: SearchRecipesRequestDto) {
+    const res = await this.recipesService.searchRecipes(queryParams);
     return res;
   }
 }

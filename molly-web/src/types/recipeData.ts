@@ -1,6 +1,6 @@
 export type Timer = {
   id: string;
-  instruction_id: string;
+  instructionID: string;
   value: number;
   unit: string;
   created: string;
@@ -8,41 +8,41 @@ export type Timer = {
 
 export type Instruction = {
   id: string;
-  recipe_id: string;
+  recipeID: string;
   index: number;
-  full_text: string;
-  has_timer?: boolean;
-  timers?: Timer[];
+  fullText: string;
+  hasTimer: boolean;
+  timers: Timer[];
   created: string;
 };
 
 export type Ingredient = {
   id: string;
-  recipe_id: string;
-  full_text: string;
-  is_optional?: boolean;
-  name?: string;
-  quantity?: number;
-  quantity_string?: string;
-  unit?: string;
-  size?: string;
-  ingredient_group?: string;
+  recipeID: string;
+  fullText: string;
+  isOptional: boolean;
+  name: string;
+  quantity: number;
+  quantityString: string;
+  unit: string;
+  size: string;
+  ingredientGroup: string;
   created: string;
 };
 
 export type RecipeData = {
   id: string;
-  recipe_url: string;
-  title?: string;
-  description?: string;
-  cooking_method?: string;
-  cuisine?: string;
-  category?: string;
-  image_url?: string;
-  yields?: string;
-  prep_time_minutes?: number;
-  cook_time_minutes?: number;
-  total_time_minutes?: number;
+  recipeURL: string;
+  title: string;
+  description: string;
+  cookingMethod: string;
+  cuisine: string;
+  category: string;
+  imageURL: string;
+  yields: string;
+  prepTimeMinutes: number;
+  cookTimeMinutes: number;
+  totalTimeMinutes: number;
   ingredients: Ingredient[];
   instructions: Instruction[];
   created: string;

@@ -2,6 +2,7 @@ import { Controller } from '@nestjs/common';
 import { EventPattern, Payload } from '@nestjs/microservices';
 import { RecipesService } from 'src/recipes/recipes.service';
 import { ScraperService } from './scraper.service';
+import { GetRecipeWithURLRequestDto } from 'src/recipes/dtos/getRecipeWithURLRequest';
 
 @Controller()
 export class ScraperController {
@@ -11,11 +12,12 @@ export class ScraperController {
   ) {}
 
   @EventPattern('scraper.results.ok')
-  async handleScraperOK(@Payload() data: { url: string }): Promise<void> {
-    const { url } = data;
-    const recipe = await this.recipeService.getRecipeWithURL(url);
+  async handleScraperOK(
+    @Payload() data: GetRecipeWithURLRequestDto,
+  ): Promise<void> {
+    const recipe = await this.recipeService.getRecipeWithURL(data);
     const res = this.scraperService.newScraperResult(recipe.id, '');
-    return this.scraperService.sendResult(url, res);
+    return this.scraperService.sendResult(data.recipe_url, res);
   }
 
   @EventPattern('scraper.results.invalid')

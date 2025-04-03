@@ -223,6 +223,8 @@ func (srv *server) SearchRecipes(ctx context.Context, req *pb.SearchRecipesReque
 	var recipes []*pb.Recipe
 
 	if req.GetQuery() == "" {
+		srv.logger.Println(req.GetResultsPerPage())
+		srv.logger.Println(req.GetPage())
 		foundRecipes, err := srv.queries.GetRecipes(ctx, (req.GetResultsPerPage() * req.GetPage()))
 		if err != nil {
 			return nil, ErrInternalServerError
