@@ -1,7 +1,7 @@
 import { status as GrpcStatus } from '@grpc/grpc-js';
 import { HttpStatus } from '@nestjs/common';
 
-export function convertGRPCToHTTP(grpcStatus: number): HttpStatus {
+export const convertGRPCToHTTP = (grpcStatus: number): HttpStatus => {
   const mapping: Record<number, HttpStatus> = {
     [GrpcStatus.OK]: HttpStatus.OK,
     [GrpcStatus.CANCELLED]: HttpStatus.REQUEST_TIMEOUT,
@@ -21,4 +21,4 @@ export function convertGRPCToHTTP(grpcStatus: number): HttpStatus {
   };
 
   return mapping[grpcStatus] || HttpStatus.INTERNAL_SERVER_ERROR;
-}
+};

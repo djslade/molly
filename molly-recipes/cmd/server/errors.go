@@ -16,7 +16,7 @@ var (
 	)
 	ErrRecipeNotFound error = status.Error(
 		codes.NotFound,
-		"recipe with supplied URL not found in database",
+		"recipe not found in database",
 	)
 	ErrInternalServerError error = status.Error(
 		codes.Internal,
