@@ -4,12 +4,12 @@ import { SearchRecipesRequestDto } from './dtos/searchRecipesRequest';
 import { GetRecipeWithIDRequestDto } from './dtos/getRecipeWithIDRequest';
 import { RpcToHttpExceptionFilter } from '../common/grpc/rpcToHttp.filter';
 
+@UseFilters(new RpcToHttpExceptionFilter())
 @Controller('recipes')
 export class RecipesController {
   constructor(private readonly recipesService: RecipesService) {}
 
   @Get(':id')
-  @UseFilters(new RpcToHttpExceptionFilter())
   async findOne(@Param() request: GetRecipeWithIDRequestDto) {
     const cached = await this.recipesService.checkCache(request.id);
     if (cached !== null) {
@@ -21,7 +21,6 @@ export class RecipesController {
   }
 
   @Get()
-  @UseFilters(new RpcToHttpExceptionFilter())
   async findAll(@Query() queryParams: SearchRecipesRequestDto) {
     const res = await this.recipesService.searchRecipes(queryParams);
     return res;
