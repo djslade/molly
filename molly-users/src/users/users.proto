@@ -1,0 +1,68 @@
+syntax = "proto3";
+
+package users;
+
+service UsersService {
+    rpc CreateUser (CreateUserRequest) returns (CreateUserResponse);
+    rpc UpdatePassword (UpdatePasswordRequest) returns (UpdatePasswordResponse);
+    rpc CreateRefreshToken (CreateRefreshTokenRequest) returns (CreateRefreshTokenResponse);
+    rpc RevokeRefreshToken (RevokeRequest) returns (RevokeResponse);
+    rpc CreateAccessToken (CreateAccessTokenRequest) returns (CreateAccessTokenResponse);
+    rpc ValidateAccessToken (ValidateRequest) returns (ValidateResponse);
+}
+
+message CreateUserRequest {
+    string email = 1;
+    string password = 2;
+}
+
+message CreateUserResponse {
+    User user = 1;
+}
+
+message UpdatePasswordRequest {
+    string password = 1;
+}
+
+message UpdatePasswordResponse {
+    User user = 1;
+}
+
+message CreateRefreshTokenRequest {
+    string email = 1;
+    string password = 2;
+}
+
+message CreateRefreshTokenResponse {
+    string refresh_token = 1;
+}
+
+message RevokeRequest {
+    string refresh_token = 1;
+}
+
+message RevokeResponse {
+    string refresh_token = 1;
+}
+
+message CreateAccessTokenRequest {
+    string refresh_token = 1;
+}
+
+message CreateAccessTokenResponse {
+    string access_token = 1;
+}
+
+message ValidateRequest {
+    string access_token = 1;
+}
+
+message ValidateResponse {
+    string access_token = 1;
+}
+
+message User {
+    string id = 1;
+    string email = 2;
+    string created = 3;
+}
