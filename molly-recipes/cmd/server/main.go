@@ -44,7 +44,10 @@ type server struct {
 func main() {
 	logger := log.New(os.Stdout, "", log.Ldate|log.Ltime)
 
-	godotenv.Load()
+	if err := godotenv.Load(); err != nil {
+		logger.Printf("There was an issue loading env variables: %v\n", err)
+		os.Exit(1)
+	}
 
 	port := os.Getenv("PORT")
 	if port == "" {

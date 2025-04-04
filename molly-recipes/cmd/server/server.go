@@ -209,7 +209,10 @@ func (srv *server) CreateRecipe(ctx context.Context, req *pb.CreateRecipeRequest
 		}
 	}
 
-	tx.Commit()
+	if err := tx.Commit(); err != nil {
+		srv.logger.Printf("database transaction error: %v", err.Error())
+		return nil, ErrInternalServerError
+	}
 
 	return &pb.RecipeIDResponse{Id: recipe.ID.String()}, nil
 }
