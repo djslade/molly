@@ -53,4 +53,8 @@ The scraper is built with Python and depends on the fantastic [Recipe Scrapers](
 
 The user-friendly gateway of the whole application. Written in Typescript and utilizing the NestJS framework, the server supports RESTful HTTP calls and websocket connections from clients, whilst itself employing gRPC calls and RabbitMQ to communicate with the other services. It also caches successful calls to the Recipe service in-memory to bolster performance.
 
+### Molly Users
+
+In development. This is the authentication service for the application, managing user accounts and access tokens. Written in Nestjs and employs a postgres database via TypeORM.
+
 Molly also supports a web client built on Vite, React, Tanstack Query and ShadCN.
