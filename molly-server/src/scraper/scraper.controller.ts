@@ -1,9 +1,11 @@
-import { Controller } from '@nestjs/common';
+import { Controller, UsePipes } from '@nestjs/common';
 import { EventPattern, Payload } from '@nestjs/microservices';
 import { RecipesService } from 'src/recipes/recipes.service';
 import { ScraperService } from './scraper.service';
 import { GetRecipeWithURLRequestDto } from 'src/recipes/dtos/getRecipeWithURLRequest';
+import { MollyValidationPipe } from 'src/common/validation/molly-validation.pipe';
 
+@UsePipes(new MollyValidationPipe())
 @Controller()
 export class ScraperController {
   constructor(

@@ -11,7 +11,7 @@ import { ScraperService } from './scraper.service';
 import { GrpcNotFoundException } from 'src/common/grpc/grpc-exceptions';
 import { RecipeUrlDto } from 'src/common/dtos/recipeUrlDto';
 import { UseFilters, UsePipes } from '@nestjs/common';
-import { ScraperWsExceptionFilter } from './scraper-ws.filter';
+import { ScraperWsExceptionFilter } from './scraperWs.filter';
 import { MollyValidationPipe } from 'src/common/validation/molly-validation.pipe';
 
 @WebSocketGateway({ cors: true })

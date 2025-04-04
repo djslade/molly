@@ -41,7 +41,7 @@ export const URLSearch = () => {
   const onSubmit = () => {
     if (loading) return;
     socket.on(`scrape.${recipeURL}`, handleResult);
-    socket.emit("scrape.request", { recipeURL });
+    socket.emit("scrape.request", { url: recipeURL });
     setLoading(true);
   };
 

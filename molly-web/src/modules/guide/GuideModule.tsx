@@ -3,9 +3,10 @@ import { Steps } from "../../types/steps";
 import { IngredientsPanel } from "./components/IngredientsPanel";
 import { InstructionsPanel } from "./components/InstructionsPanel";
 import { OverviewPanel } from "./components/OverviewPanel";
+import { RecipeData } from "@/types/recipeData";
 
 interface GuideModuleProps {
-  recipeData: any;
+  recipeData: RecipeData;
 }
 
 export const GuideModule = ({ recipeData }: GuideModuleProps) => {

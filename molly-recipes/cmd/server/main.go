@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"log"
 	"net"
@@ -8,15 +9,35 @@ import (
 
 	"github.com/djslade/molly-recipes/internal/database"
 	pb "github.com/djslade/molly-recipes/internal/proto"
+	"github.com/google/uuid"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 	"google.golang.org/grpc"
 )
 
+type ServerDB interface {
+	Begin() (*sql.Tx, error)
+}
+
+type ServerQueries interface {
+	WithTx(*sql.Tx) *database.Queries
+	GetRecipeByID(context.Context, uuid.UUID) (database.Recipe, error)
+	GetRecipeByURL(context.Context, string) (database.Recipe, error)
+	CreateRecipe(context.Context, database.CreateRecipeParams) (database.Recipe, error)
+	GetIngredientsByRecipeID(context.Context, uuid.UUID) ([]database.Ingredient, error)
+	GetInstructionsByRecipeID(context.Context, uuid.UUID) ([]database.Instruction, error)
+	GetTimersByInstructionID(context.Context, uuid.UUID) ([]database.Timer, error)
+	CreateIngredient(context.Context, database.CreateIngredientParams) (database.Ingredient, error)
+	CreateInstruction(context.Context, database.CreateInstructionParams) (database.Instruction, error)
+	CreateTimer(context.Context, database.CreateTimerParams) (database.Timer, error)
+	CountRecipes(context.Context) (int64, error)
+	GetRecipes(context.Context, int32) ([]database.Recipe, error)
+}
+
 type server struct {
 	pb.RecipesServiceServer
-	db      *sql.DB
-	queries *database.Queries
+	db      ServerDB
+	queries ServerQueries
 	logger  *log.Logger
 }
 
