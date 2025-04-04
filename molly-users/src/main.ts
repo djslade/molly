@@ -17,4 +17,4 @@ async function bootstrap() {
   // Listens on port 5000
   await app.listen();
 }
-bootstrap();
+void bootstrap();

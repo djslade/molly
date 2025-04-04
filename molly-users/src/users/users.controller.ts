@@ -1,16 +1,21 @@
-import { Controller } from '@nestjs/common';
+import { Controller, UseFilters } from '@nestjs/common';
 import { GrpcMethod } from '@nestjs/microservices';
 import { CreateUserRequest, CreateUserResponse } from './users';
-import { Metadata, ServerUnaryCall } from '@grpc/grpc-js';
+import { plainToInstance } from 'class-transformer';
+import { CreateUserRequestDto } from './dtos/createUserRequest.dt';
+import { UsersService } from './users.service';
+import { QueryExceptionFilter } from './queryException.filter';
 
+@UseFilters(new QueryExceptionFilter())
 @Controller()
 export class UsersController {
+  constructor(private readonly usersService: UsersService) {}
   @GrpcMethod('UsersService', 'CreateUser')
-  createUser(
-    data: CreateUserRequest,
-    metadata: Metadata,
-    call: ServerUnaryCall<CreateUserRequest, CreateUserResponse>,
-  ): CreateUserResponse {
-    return { user: { id: '123', email: 'hello@email.com', created: 'today' } };
+  async createUser(data: CreateUserRequest): Promise<CreateUserResponse> {
+    const request = plainToInstance(CreateUserRequestDto, data);
+
+    const { id, email, created } = await this.usersService.createUser(request);
+
+    return { user: { id, email, created: created.toDateString() } };
   }
 }
