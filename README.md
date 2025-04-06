@@ -55,6 +55,6 @@ The user-friendly gateway of the whole application. Written in Typescript and ut
 
 ### Molly Users
 
-In development. This is the authentication service for the application, managing user accounts and access tokens. Written in Nestjs and employs a postgres database via TypeORM.
+In development. This is the authentication service for the application, managing user accounts and access tokens. This gRPC serverritten in Nestjs and employs a postgres database via TypeORM.
 
 Molly also supports a web client built on Vite, React, Tanstack Query and ShadCN.

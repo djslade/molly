@@ -6,6 +6,8 @@ import { CreateUserResponseDto } from './dtos/createUserResponse.dto';
 import { plainToInstance } from 'class-transformer';
 import { lastValueFrom } from 'rxjs';
 import { handleGrpcException } from 'src/common/grpc/handleRpcException.util';
+import { CreateRefreshTokenRequestDto } from './dtos/createRefreshTokenRequest.dto';
+import { CreateRefreshTokenResponseDto } from './dtos/createRefreshTokenResponse.dto';
 
 @Injectable()
 export class UsersService {
@@ -28,6 +30,19 @@ export class UsersService {
       return plainToInstance(
         CreateUserResponseDto,
         await lastValueFrom(this.usersService.CreateUser(request)),
+      );
+    } catch (err) {
+      throw handleGrpcException(err as Error);
+    }
+  }
+
+  async createRefreshToken(
+    request: CreateRefreshTokenRequestDto,
+  ): Promise<CreateRefreshTokenResponseDto> {
+    try {
+      return plainToInstance(
+        CreateRefreshTokenResponseDto,
+        await lastValueFrom(this.usersService.CreateRefreshToken(request)),
       );
     } catch (err) {
       throw handleGrpcException(err as Error);
