@@ -9,6 +9,7 @@ service UsersService {
     rpc RevokeRefreshToken (RevokeRequest) returns (RevokeResponse);
     rpc CreateAccessToken (CreateAccessTokenRequest) returns (CreateAccessTokenResponse);
     rpc ValidateAccessToken (ValidateRequest) returns (ValidateResponse);
+    rpc ValidateRefreshToken (Validate)
 }
 
 message CreateUserRequest {
@@ -58,7 +59,7 @@ message ValidateRequest {
 }
 
 message ValidateResponse {
-    string access_token = 1;
+    bool is_valid = 1;
 }
 
 message User {

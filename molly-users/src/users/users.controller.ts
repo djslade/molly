@@ -26,6 +26,9 @@ export class UsersController {
     return { user: { id, email, created: created.toDateString() } };
   }
 
+  @GrpcMethod('UsersService', 'CreateAccessToken')
+  async signAccessToken() {}
+
   @GrpcMethod('UsersService', 'CreateRefreshToken')
   async createRefreshToken(
     data: CreateRefreshTokenRequest,

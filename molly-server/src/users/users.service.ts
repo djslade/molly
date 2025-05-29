@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ClientGrpc } from '@nestjs/microservices';
 import { IUsersGrpcService } from './interfaces/usersGrpcService';
 import { CreateUserRequestDto } from './dtos/createUserRequest.dto';
@@ -8,6 +8,7 @@ import { lastValueFrom } from 'rxjs';
 import { handleGrpcException } from 'src/common/grpc/handleRpcException.util';
 import { CreateRefreshTokenRequestDto } from './dtos/createRefreshTokenRequest.dto';
 import { CreateRefreshTokenResponseDto } from './dtos/createRefreshTokenResponse.dto';
+import { IncomingHttpHeaders } from 'http';
 
 @Injectable()
 export class UsersService {
@@ -22,6 +23,15 @@ export class UsersService {
     this.usersService =
       this.client.getService<IUsersGrpcService>('UsersService');
   }
+
+  getBearerToken(headers: IncomingHttpHeaders): string {
+    const { authorization } = headers;
+    const token = authorization?.split(' ')[1];
+    if (!token) throw new UnauthorizedException('Could not find bearer token');
+    return token;
+  }
+
+  async validateAccessToken(token: string) {}
 
   async createUser(
     request: CreateUserRequestDto,

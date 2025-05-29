@@ -1,21 +1,13 @@
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { BaseEntity } from 'src/database/base.entity';
+import { RefreshToken } from 'src/tokens/entities/refresh-token.entity';
+import { Entity, OneToMany, OneToOne } from 'typeorm';
+import { Credentials } from 'src/credentials/entities/credentials.entity';
 
 @Entity()
-export class User {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+export class User extends BaseEntity {
+  @OneToMany(() => RefreshToken, (refreshToken) => refreshToken.user)
+  refreshTokens: RefreshToken;
 
-  @Column({ type: 'text', unique: true })
-  email: string;
-
-  @Column({ type: 'text' })
-  hashedPassword: string;
-
-  @CreateDateColumn({ type: 'timestamp' })
-  created: Date;
+  @OneToOne(() => Credentials, (credentials) => credentials.user)
+  credentials: Credentials;
 }
