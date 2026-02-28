@@ -52,7 +52,8 @@ func (srv *server) GetRecipeWithID(ctx context.Context, req *pb.GetRecipeWithIDR
 		return nil, ErrInternalServerError
 	}
 
-	var ingredients []*pb.Ingredient
+	ingredients := make([]*pb.Ingredient, 0, len(foundIngredients))
+
 	for _, ing := range foundIngredients {
 		ingredients = append(ingredients, &pb.Ingredient{
 			Id:              ing.ID.String(),
@@ -76,7 +77,7 @@ func (srv *server) GetRecipeWithID(ctx context.Context, req *pb.GetRecipeWithIDR
 		return nil, ErrInternalServerError
 	}
 
-	var instructions []*pb.Instruction
+	instructions := make([]*pb.Instruction, 0, len(foundInstructions))
 	for _, inst := range foundInstructions {
 		foundTimers, err := srv.queries.GetTimersByInstructionID(ctx, inst.ID)
 		if err != nil {
