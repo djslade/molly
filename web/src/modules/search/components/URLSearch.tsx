@@ -22,40 +22,59 @@ export const URLSearch = () => {
     setRecipeURL(evt.target.value);
   };
 
-  const handleResult = (value: SocketResponse) => {
+  type WSMessage = {
+    event: string;
+    payload: SocketResponse;
+  };
+
+  let waitingFor: string | null = null;
+
+  const handleMessage = (e: MessageEvent) => {
+    const msg = JSON.parse(e.data) as WSMessage;
+
+    if (!waitingFor) return;
+    if (msg.event !== waitingFor) return;
+
+    const value = msg.payload;
+
     try {
       if (!value.id) {
         throw new Error(value.error || "An unknown error occurred");
       }
+
       navigate(`/recipe/${value.id}`);
     } catch (err) {
       if (err instanceof Error) {
         setErrorMessage(err.message);
       }
     } finally {
-      socket.off(`scrape.${recipeURL}`, handleResult);
+      waitingFor = null;
       setLoading(false);
     }
   };
 
   const onSubmit = () => {
-    if (loading) return;
-    socket.on(`scrape.${recipeURL}`, handleResult);
-    socket.emit("scrape.request", { url: recipeURL });
+    if (loading || socket.readyState !== WebSocket.OPEN) return;
+
+    waitingFor = `scrape.${recipeURL}`;
+
+    socket.send(
+      JSON.stringify({
+        event: "scrape.request",
+        payload: {
+          url: recipeURL,
+        },
+      }),
+    );
+
     setLoading(true);
   };
 
   useEffect(() => {
-    const onError = (value: SocketResponse) => {
-      setErrorMessage(value.error || "An unknown error occurred");
-      socket.off(`scrape.${recipeURL}`, handleResult);
-      setLoading(false);
-    };
-
-    socket.on("error", onError);
+    socket.addEventListener("message", handleMessage);
 
     return () => {
-      socket.off("error", onError);
+      socket.removeEventListener("message", handleMessage);
     };
   }, []);
 

@@ -13,7 +13,7 @@ import (
 
 func New(mux *http.ServeMux) *http.Server {
 	return &http.Server{
-		Addr:    ":8080",
+		Addr:    ":3000",
 		Handler: mux,
 	}
 }

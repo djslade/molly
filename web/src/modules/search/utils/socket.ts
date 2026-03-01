@@ -1,6 +1,5 @@
 import { getServerURL } from "@/utils/getServerUrl";
-import { io } from "socket.io-client";
 
-const URL = getServerURL();
+const base = getServerURL().replace(/^http/, "ws");
 
-export const socket = io(URL);
+export const socket = new WebSocket(`${base}/recipes/import`);

@@ -6,6 +6,13 @@ import (
 	"time"
 )
 
+func New(recipes RecipeClient, cache Cache) *Handler {
+	return &Handler{
+		recipes: recipes,
+		cache:   cache,
+	}
+}
+
 func (h *Handler) GetRecipe(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
@@ -26,9 +33,8 @@ func (h *Handler) GetRecipe(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		return
 	}
-
 	h.cache.Set(id, res)
 
 }
 
-func (h *Handler) GetAllRecipes(w http.ResponseController, r *http.Request) {}
+func (h *Handler) GetAllRecipes(w http.ResponseWriter, r *http.Request) {}

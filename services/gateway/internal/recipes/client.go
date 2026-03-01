@@ -41,6 +41,11 @@ func (c *Client) GetRecipeWithId(ctx context.Context, id string) (*Recipe, error
 	return recipeFromPB(res.Recipe), nil
 }
 
+func (c *Client) GetRecipeWithUrl(ctx context.Context, url string) (string, error) {
+	res, err := c.client.GetRecipeWithURL(ctx, &recipespb.GetRecipeWithURLRequest{RecipeUrl: url})
+	return res.Id, err
+}
+
 func recipeFromPB(r *recipespb.Recipe) *Recipe {
 	if r == nil {
 		return nil
