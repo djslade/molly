@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"net/http"
 	"time"
 
 	"github.com/djslade/molly/internal/config"
@@ -14,6 +15,6 @@ type application struct {
 }
 
 func main() {
-	srv := server.New()
+	srv := server.New(http.NewServeMux())
 	server.Run(context.Background(), srv, 10*time.Second)
 }
