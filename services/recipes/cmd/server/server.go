@@ -226,28 +226,26 @@ func (srv *server) SearchRecipes(ctx context.Context, req *pb.SearchRecipesReque
 
 	var recipes []*pb.Recipe
 
-	if req.GetQuery() == "" {
-		foundRecipes, err := srv.queries.GetRecipes(ctx, (req.GetResultsPerPage() * req.GetPage()))
-		if err != nil {
-			return nil, ErrInternalServerError
-		}
-		for _, recipe := range foundRecipes {
-			recipes = append(recipes, &pb.Recipe{
-				Id:               recipe.ID.String(),
-				RecipeUrl:        recipe.RecipeUrl,
-				Title:            recipe.Title,
-				Description:      recipe.Description,
-				Cuisine:          recipe.Cuisine,
-				CookingMethod:    recipe.CookingMethod,
-				Category:         recipe.Category,
-				ImageUrl:         recipe.ImageUrl,
-				Yields:           recipe.Yields,
-				PrepTimeMinutes:  recipe.PrepTimeMinutes,
-				CookTimeMinutes:  recipe.CookTimeMinutes,
-				TotalTimeMinutes: recipe.TotalTimeMinutes,
-				Created:          recipe.Created.String(),
-			})
-		}
+	foundRecipes, err := srv.queries.GetRecipes(ctx, (req.GetResultsPerPage() * req.GetPage()))
+	if err != nil {
+		return nil, ErrInternalServerError
+	}
+	for _, recipe := range foundRecipes {
+		recipes = append(recipes, &pb.Recipe{
+			Id:               recipe.ID.String(),
+			RecipeUrl:        recipe.RecipeUrl,
+			Title:            recipe.Title,
+			Description:      recipe.Description,
+			Cuisine:          recipe.Cuisine,
+			CookingMethod:    recipe.CookingMethod,
+			Category:         recipe.Category,
+			ImageUrl:         recipe.ImageUrl,
+			Yields:           recipe.Yields,
+			PrepTimeMinutes:  recipe.PrepTimeMinutes,
+			CookTimeMinutes:  recipe.CookTimeMinutes,
+			TotalTimeMinutes: recipe.TotalTimeMinutes,
+			Created:          recipe.Created.String(),
+		})
 	}
 
 	return &pb.RecipesResponse{

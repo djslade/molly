@@ -41,6 +41,25 @@ func (c *Client) GetRecipeWithId(ctx context.Context, id string) (*Recipe, error
 	return recipeFromPB(res.Recipe), nil
 }
 
+func (c *Client) SearchRecipes(ctx context.Context, query string, page, resultsPerPage int32) (int32, []*Recipe, error) {
+	res, err := c.client.SearchRecipes(ctx, &recipespb.SearchRecipesRequest{
+		Query:          query,
+		Page:           page,
+		ResultsPerPage: resultsPerPage,
+	})
+	if err != nil {
+		return 0, nil, err
+	}
+
+	total := res.Total
+	recipes := make([]*Recipe, 0, len(res.Recipes))
+	for _, r := range res.Recipes {
+		recipes = append(recipes, recipeFromPB(r))
+	}
+	return total, recipes, nil
+
+}
+
 func (c *Client) GetRecipeWithUrl(ctx context.Context, url string) (string, error) {
 	res, err := c.client.GetRecipeWithURL(ctx, &recipespb.GetRecipeWithURLRequest{RecipeUrl: url})
 	return res.Id, err

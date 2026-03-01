@@ -14,7 +14,7 @@ import (
 func New(mux *http.ServeMux) *http.Server {
 	return &http.Server{
 		Addr:    ":3000",
-		Handler: mux,
+		Handler: cors(mux),
 	}
 }
 
@@ -55,4 +55,20 @@ func Run(ctx context.Context, srv *http.Server, shutdownTimeout time.Duration) e
 	}
 
 	return nil
+}
+
+func cors(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Headers", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "*")
+
+		if r.Method == http.MethodOptions {
+			w.WriteHeader(http.StatusNoContent)
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
 }

@@ -1,5 +1,1 @@
-import { getServerURL } from "@/utils/getServerUrl";
-
-const base = getServerURL().replace(/^http/, "ws");
-
-export const socket = new WebSocket(`${base}/recipes/import`);
+export const socket = new WebSocket("ws://localhost:3000/recipes/import");

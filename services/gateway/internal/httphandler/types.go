@@ -8,6 +8,7 @@ import (
 
 type RecipeClient interface {
 	GetRecipeWithId(ctx context.Context, id string) (*recipes.Recipe, error)
+	SearchRecipes(ctx context.Context, query string, page, resultsPerPage int32) (int32, []*recipes.Recipe, error)
 }
 
 type Cache interface {

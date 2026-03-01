@@ -2,6 +2,7 @@ package ws
 
 import (
 	"context"
+	"log"
 	"net/http"
 
 	"github.com/gorilla/websocket"
@@ -20,7 +21,9 @@ type startMessage struct {
 	URL string `json:"url"`
 }
 
-var upgrader = websocket.Upgrader{}
+var upgrader = websocket.Upgrader{
+	CheckOrigin: func(r *http.Request) bool { return true },
+}
 
 func NewHandler(hub *Hub, publisher Publisher) *Handler {
 	return &Handler{
@@ -32,6 +35,7 @@ func NewHandler(hub *Hub, publisher Publisher) *Handler {
 func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
+		log.Println(err)
 		return
 	}
 

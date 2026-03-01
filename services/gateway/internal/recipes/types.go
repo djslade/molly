@@ -2,17 +2,17 @@ package recipes
 
 type Recipe struct {
 	ID               string `json:"id"`
-	RecipeURL        string `json:"recipe_url"`
+	RecipeURL        string `json:"recipeURL"`
 	Title            string `json:"title"`
 	Description      string `json:"description"`
 	Cuisine          string `json:"cuisine"`
-	CookingMethod    string `json:"cooking_method"`
+	CookingMethod    string `json:"cookingMethod"`
 	Category         string `json:"category"`
-	ImageURL         string `json:"image_url"`
+	ImageURL         string `json:"imageURL"`
 	Yields           string `json:"yields"`
-	PrepTimeMinutes  int32  `json:"prep_time_minutes"`
-	CookTimeMinutes  int32  `json:"cook_time_minutes"`
-	TotalTimeMinutes int32  `json:"total_time_minutes"`
+	PrepTimeMinutes  int32  `json:"prepTimeMinutes"`
+	CookTimeMinutes  int32  `json:"cookTimeMinutes"`
+	TotalTimeMinutes int32  `json:"totalTimeMinutes"`
 	Created          string `json:"created"`
 
 	Ingredients  []Ingredient  `json:"ingredients"`
@@ -21,31 +21,31 @@ type Recipe struct {
 
 type Ingredient struct {
 	ID              string  `json:"id"`
-	RecipeID        string  `json:"recipe_id"`
-	FullText        string  `json:"full_text"`
-	IsOptional      bool    `json:"is_optional"`
+	RecipeID        string  `json:"recipeID"`
+	FullText        string  `json:"fullText"`
+	IsOptional      bool    `json:"isOptional"`
 	Name            string  `json:"name"`
 	Quantity        float64 `json:"quantity"`
-	QuantityString  string  `json:"quantity_string"`
+	QuantityString  string  `json:"quantityString"`
 	Unit            string  `json:"unit"`
 	Size            string  `json:"size"`
-	IngredientGroup string  `json:"ingredient_group"`
+	IngredientGroup string  `json:"ingredientGroup"`
 	Created         string  `json:"created"`
 }
 
 type Instruction struct {
 	ID       string  `json:"id"`
-	RecipeID string  `json:"recipe_id"`
+	RecipeID string  `json:"recipeID"`
 	Index    int32   `json:"index"`
-	FullText string  `json:"full_text"`
-	HasTimer bool    `json:"has_timer"`
+	FullText string  `json:"fullText"`
+	HasTimer bool    `json:"hasTimer"`
 	Created  string  `json:"created"`
 	Timers   []Timer `json:"timers"`
 }
 
 type Timer struct {
 	ID            string `json:"id"`
-	InstructionID string `json:"instruction_id"`
+	InstructionID string `json:"instructionID"`
 	Value         int32  `json:"value"`
 	Unit          string `json:"unit"`
 	Created       string `json:"created"`

@@ -44,8 +44,9 @@ export const SearchModule = () => {
     staleTime: 100,
     queryFn: async () => {
       const response = await fetch(
-        `${getServerURL()}/recipes?page=${params.get("p") || "1"}`
+        `${getServerURL()}/recipes?page=${params.get("p") || "1"}`,
       );
+      console.log(response);
       const data = await response.json();
       const res: SearchRecipesResponse = {
         total: data.total,

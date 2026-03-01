@@ -17,11 +17,9 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	log.Print(1)
 	hub := ws.NewHub()
-	log.Print(2)
 
-	recipesClient, err := recipes.New("")
+	recipesClient, err := recipes.New("localhost:8080")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -64,8 +62,8 @@ func main() {
 func registerRoutes(httpHandler httphandler.Handler, wsHandler ws.Handler) *http.ServeMux {
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("/recipes/:id", httpHandler.GetRecipe)
-	mux.HandleFunc("/recipes", httpHandler.GetAllRecipes)
+	mux.HandleFunc("/recipes/", httpHandler.GetRecipe)
+	mux.HandleFunc("/recipes", httpHandler.SearchRecipes)
 	mux.HandleFunc("/recipes/import", wsHandler.ServeHTTP)
 
 	return mux
