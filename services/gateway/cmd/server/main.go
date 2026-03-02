@@ -24,12 +24,14 @@ func main() {
 		log.Fatal(err)
 	}
 	defer recipesClient.Close()
+	log.Print("gRPC connection to recipes service established")
 
 	rmqConn, err := pubsub.NewConnection("amqp://localhost:5672")
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer rmqConn.Close()
+	log.Print("amqp connection to RMQ broker established")
 
 	rmqChannel, err := pubsub.NewChannel(rmqConn)
 	if err != nil {

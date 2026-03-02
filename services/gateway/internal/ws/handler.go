@@ -2,6 +2,7 @@ package ws
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -29,6 +30,14 @@ type payload struct {
 type startMessage struct {
 	Event   string  `json:"event"`
 	Payload payload `json:"payload"`
+}
+
+type ScraperResult struct {
+	Event   string `json:"event"`
+	Payload struct {
+		ID    string `json:"id,omitempty"`
+		Error string `json:"error,omitempty"`
+	} `json:"payload"`
 }
 
 var upgrader = websocket.Upgrader{
@@ -68,7 +77,10 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	recipeId, err := h.recipeService.GetRecipeWithUrl(r.Context(), recipeUrl)
 	if recipeId != "" {
-		h.hub.Send(msg.Payload.URL, recipeId)
+		res := ScraperResult{}
+		res.Event = fmt.Sprintf("scrape.%v", recipeUrl)
+		res.Payload.ID = recipeId
+		h.hub.Send(recipeUrl, res)
 		return
 	}
 

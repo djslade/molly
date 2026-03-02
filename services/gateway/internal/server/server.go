@@ -28,6 +28,8 @@ func Run(ctx context.Context, srv *http.Server, shutdownTimeout time.Duration) e
 		close(srvErr)
 	}()
 
+	log.Printf("Listening on port%v", srv.Addr)
+
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, syscall.SIGTERM, syscall.SIGINT)
 	defer signal.Stop(stop)

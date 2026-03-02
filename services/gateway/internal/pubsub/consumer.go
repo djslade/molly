@@ -89,6 +89,8 @@ func (c *ScraperResultsConsumer) Start(ctx context.Context) error {
 		return err
 	}
 
+	log.Printf("Listening to %v queue", queue)
+
 	go func() {
 		for {
 			select {
@@ -118,19 +120,24 @@ func (c *ScraperResultsConsumer) dispatch(msg amqp.Delivery) {
 		c.handleOK(p.Data.URL)
 
 	case "scraper.results.invalid":
-		//c.handleInvalid(msg.Body)
+		// This pattern indicates a malformed request, ie an error only in development
+		log.Print("Scraper service indicated that a request was invalid.")
+		c.handleError(p.Data.URL, "An unknown error occurred")
 
 	case "scraper.results.fail":
-		// c.handleFail(msg.Body)
+		c.handleError(p.Data.URL, "We couldn't import a recipe from this URL")
 
 	case "scraper.results.unknown":
-		// c.handleUnknown(msg.Body)
+		log.Print("An unknown error occurred in the scraper or recipe service")
+		c.handleError(p.Data.URL, "Oops! Something went wrong with our server")
 
 	case "scraper.results.internal":
-		// c.handleInternal(msg.Body)
+		log.Print("An internal error occurred in the scraper or recipe service")
+		c.handleError(p.Data.URL, "Oops! Something went wrong with our server")
 
 	case "scraper.results.unavailable":
-		// c.handleUnavailable(msg.Body)
+		log.Print("The recipe service appears to be unavailable")
+		c.handleError(p.Data.URL, "Oops! Looks like this service isn't available right now")
 	}
 }
 
@@ -146,8 +153,6 @@ func (c *ScraperResultsConsumer) handleOK(recipeUrl string) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	log.Println(recipeUrl)
-
 	recipeId, err := c.recipeService.GetRecipeWithUrl(ctx, recipeUrl)
 	if err != nil {
 		log.Printf("could not retrieve recipe URL, %v", err)
@@ -155,9 +160,16 @@ func (c *ScraperResultsConsumer) handleOK(recipeUrl string) {
 	}
 
 	res := ScraperResult{}
-
 	res.Event = fmt.Sprintf("scrape.%v", recipeUrl)
 	res.Payload.ID = recipeId
+
+	c.hub.Send(recipeUrl, res)
+}
+
+func (c *ScraperResultsConsumer) handleError(recipeUrl string, errorMessage string) {
+	res := ScraperResult{}
+	res.Event = "error"
+	res.Payload.Error = errorMessage
 
 	c.hub.Send(recipeUrl, res)
 }
