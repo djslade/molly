@@ -18,7 +18,7 @@ export const IngredientsPanel = ({
         <div>
           {recipeData.ingredients.map((ingredient) => (
             <div key={ingredient.id}>
-              <span>{ingredient.full_text}</span>
+              <span>{ingredient.fullText}</span>
             </div>
           ))}
         </div>

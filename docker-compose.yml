@@ -11,30 +11,42 @@ services:
       retries: 5
       start_period: 30s
       timeout: 10s
+  rmq:
+    image: rabbitmq:3.13
+    env_file: .env
+  recipes:
+    image: fenroe/molly-recipes:latest
+    env_file: .env
+    pull_policy: always
+    depends_on:
+      recipesdb:
+        condition: service_healthy
+  scraper:
+    image: fenroe/molly-scraper:latest
+    env_file: .env
+    pull_policy: always
+    depends_on:
+      rmq:
+        condition: service_started
   gateway:
     image: fenroe/molly-gateway:latest
     env_file: .env
     pull_policy: always
     depends_on:
-      db:
-        condition: service_healthy
-  recipes:
-    image: fenroe/molly-recipes:latest
-    env_file: .env
-    pull_policy: always
-    ports:
-      - 334:3000
-    depends_on:
-      server:
+      rmq:
+        condition: service_started
+      recipes:
+        condition: service_started
+      scraper:
         condition: service_started
   web:
     image: fenroe/molly-web:latest
     env_file: .env
     pull_policy: always
     ports:
-      - 333:3000
+      - 2000:3000
     depends_on:
-      server:
+      gateway:
         condition: service_started
 volumes:
   recipesdbvol:

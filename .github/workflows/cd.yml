@@ -1,0 +1,112 @@
+name: cd
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.21"
+          cache: true
+
+      - name: Build gateway binary
+        run: go build -o services/gateway/mollygateway ./services/gateway/cmd/server
+
+      - name: Build recipes binary
+        run: go build -o services/recipes/mollyrecipes ./services/recipes/cmd/server
+
+      - name: Create .env file for web
+        run: echo "VITE_SERVER_ENDPOINT=${{ secrets.SERVER_CONN }}" > web/.env
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: Build docker image and push - web
+        uses: docker/build-push-action@v6
+        with:
+          context: ./web
+          push: true
+          tags: fenroe/molly-web:latest
+
+      - name: Build docker image and push - gateway
+        uses: docker/build-push-action@v6
+        with:
+          context: ./services/gateway
+          push: true
+          tags: fenroe/molly-gateway:latest
+
+      - name: Build docker image and push - recipes
+        uses: docker/build-push-action@v6
+        with:
+          context: ./services/recipes
+          push: true
+          tags: fenroe/molly-recipes:latest
+
+      - name: Build docker image and push - scraper
+        uses: docker/build-push-action@v6
+        with:
+          context: ./services/scraper
+          push: true
+          tags: fenroe/molly-scraper:latest
+
+  deploy:
+    needs: [docker]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create .env file for compose
+        run: |
+          touch .env
+          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
+          echo "SIGNUP_SECRET=${{ secrets.SIGNUP_SECRET }}" >> .env
+          echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}" >> .env
+          echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> .env
+          echo "AWS_S3_REGION=${{ secrets.AWS_S3_REGION }}" >> .env
+          echo "AWS_S3_BUCKET=${{ secrets.AWS_S3_BUCKET}}" >> .env
+          echo "AWS_CF_DOMAIN=${{ secrets.AWS_CF_DOMAIN }}" >> .env
+          echo "DB_USERNAME=${{ secrets.DB_USERNAME }}" >> .env
+          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
+          echo "DB_NAME=${{ secrets.DB_NAME }}" >> .env
+          echo "DB_HOST=${{ secrets.DB_HOST }}" >> .env
+          echo "MODE=${{ secrets.MODE }}" >> .env
+          echo "MAIL_KEY=${{ secrets.MAIL_KEY }}" >> .env
+          echo "MAIL_SEND_TO_ADDRESS=${{ secrets.MAIL_SEND_TO_ADDRESS }}" >> .env
+
+      - name: Move files to server
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.VPS_IP }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          source: docker-compose.yml,.env
+          target: apps/salinstudio
+      - name: SSH into server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.VPS_IP }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            cd apps/molly
+            cat .env
+            docker compose up -d
+            rm -rf docker-compose.yml
+            rm -rf .env
+            docker image prune -a -f

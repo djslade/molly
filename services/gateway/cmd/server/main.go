@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/djslade/molly/internal/httphandler"
@@ -19,14 +20,14 @@ func main() {
 
 	hub := ws.NewHub()
 
-	recipesClient, err := recipes.New("localhost:8080")
+	recipesClient, err := recipes.New(os.Getenv("RECIPES_CONN"))
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer recipesClient.Close()
 	log.Print("gRPC connection to recipes service established")
 
-	rmqConn, err := pubsub.NewConnection("amqp://localhost:5672")
+	rmqConn, err := pubsub.NewConnection(os.Getenv("RMQ_CONN"))
 	if err != nil {
 		log.Fatal(err)
 	}

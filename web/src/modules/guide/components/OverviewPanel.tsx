@@ -21,10 +21,7 @@ export const OverviewPanel = ({ recipeData, next }: OverviewPanelProps) => {
       <CardContent>
         <div className="flex w-full justify-between">
           {" "}
-          <img
-            src={recipeData?.image_url}
-            className="h-80 aspect-square w-80"
-          />
+          <img src={recipeData?.imageURL} className="h-80 aspect-square w-80" />
           <CardDescription className="max-w-prose">
             {recipeData?.description}
           </CardDescription>

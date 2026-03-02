@@ -18,7 +18,7 @@ export const InstructionsPanel = ({
         <div>
           {recipeData.instructions.map((instruction) => (
             <div key={instruction.id}>
-              <span>{instruction.full_text}</span>
+              <span>{instruction.fullText}</span>
             </div>
           ))}
         </div>
