@@ -62,6 +62,9 @@ func (c *Client) SearchRecipes(ctx context.Context, query string, page, resultsP
 
 func (c *Client) GetRecipeWithUrl(ctx context.Context, url string) (string, error) {
 	res, err := c.client.GetRecipeWithURL(ctx, &recipespb.GetRecipeWithURLRequest{RecipeUrl: url})
+	if err != nil {
+		return "", err
+	}
 	return res.Id, err
 }
 

@@ -51,7 +51,7 @@ func main() {
 
 	handlerHttp := httphandler.New(recipesClient, nil)
 
-	handlerWs := ws.NewHandler(hub, scrapePublisher)
+	handlerWs := ws.NewHandler(hub, scrapePublisher, recipesClient)
 
 	routes := registerRoutes(*handlerHttp, *handlerWs)
 

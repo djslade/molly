@@ -3,6 +3,8 @@ package pubsub
 import (
 	"context"
 	"encoding/json"
+	"fmt"
+	"log"
 	"time"
 
 	amqp "github.com/rabbitmq/amqp091-go"
@@ -20,6 +22,13 @@ type ScraperResultsConsumer struct {
 	ch            *amqp.Channel
 	hub           Hub
 	recipeService RecipeService
+}
+
+type payload struct {
+	Pattern string `json:"pattern"`
+	Data    struct {
+		URL string `json:"url"`
+	} `json:"data"`
 }
 
 const exchange = "amq.topic"
@@ -98,13 +107,18 @@ func (c *ScraperResultsConsumer) Start(ctx context.Context) error {
 }
 
 func (c *ScraperResultsConsumer) dispatch(msg amqp.Delivery) {
-	switch msg.RoutingKey {
+	var p payload
+	if err := json.Unmarshal(msg.Body, &p); err != nil {
+		return
+	}
+	fmt.Println(p)
+	switch p.Pattern {
 
 	case "scraper.results.ok":
-		c.handleOK(msg.Body)
+		c.handleOK(p.Data.URL)
 
 	case "scraper.results.invalid":
-		// c.handleInvalid(msg.Body)
+		//c.handleInvalid(msg.Body)
 
 	case "scraper.results.fail":
 		// c.handleFail(msg.Body)
@@ -120,26 +134,30 @@ func (c *ScraperResultsConsumer) dispatch(msg amqp.Delivery) {
 	}
 }
 
-type okPayload struct {
-	RecipeURL string `json:"recipe_url"`
+type ScraperResult struct {
+	Event   string `json:"event"`
+	Payload struct {
+		ID    string `json:"id,omitempty"`
+		Error string `json:"error,omitempty"`
+	} `json:"payload"`
 }
 
-func (c *ScraperResultsConsumer) handleOK(body []byte) {
-
-	var p okPayload
-	if err := json.Unmarshal(body, &p); err != nil {
-		return
-	}
-
+func (c *ScraperResultsConsumer) handleOK(recipeUrl string) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	recipeId, err := c.recipeService.GetRecipeWithUrl(ctx, p.RecipeURL)
+	log.Println(recipeUrl)
+
+	recipeId, err := c.recipeService.GetRecipeWithUrl(ctx, recipeUrl)
 	if err != nil {
+		log.Printf("could not retrieve recipe URL, %v", err)
 		return
 	}
 
-	// res := c.builder.New(recipe.ID, "")
+	res := ScraperResult{}
 
-	c.hub.Send(p.RecipeURL, recipeId)
+	res.Event = fmt.Sprintf("scrape.%v", recipeUrl)
+	res.Payload.ID = recipeId
+
+	c.hub.Send(recipeUrl, res)
 }

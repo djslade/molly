@@ -1,6 +1,7 @@
 package ws
 
 import (
+	"log"
 	"sync"
 
 	"github.com/gorilla/websocket"
@@ -18,6 +19,7 @@ func NewHub() *Hub {
 }
 
 func (h *Hub) Register(url string, c *websocket.Conn) {
+	log.Print("registering")
 	h.mu.Lock()
 	defer h.mu.Unlock()
 
@@ -27,7 +29,7 @@ func (h *Hub) Register(url string, c *websocket.Conn) {
 	h.conns[url][c] = struct{}{}
 }
 
-func (h *Hub) Deregister(url string, c *websocket.Conn) {
+func (h *Hub) Remove(url string, c *websocket.Conn) {
 	h.mu.Lock()
 	defer h.mu.Unlock()
 
@@ -40,11 +42,13 @@ func (h *Hub) Deregister(url string, c *websocket.Conn) {
 }
 
 func (h *Hub) Send(url string, v any) {
+	log.Println("made it to send")
 	h.mu.RLock()
 	conns := h.conns[url]
 	h.mu.RUnlock()
 
 	for c := range conns {
+		log.Println("yes")
 		_ = c.WriteJSON(v)
 	}
 }

@@ -1,6 +1,5 @@
 from pika.channel import Channel
 from .publish_body import PublishBody
-import json
 
 class Publisher():
     def __init__(self, channel:Channel, queue:str, exchange:str=""):

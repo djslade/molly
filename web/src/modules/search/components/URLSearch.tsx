@@ -27,13 +27,8 @@ export const URLSearch = () => {
     payload: SocketResponse;
   };
 
-  let waitingFor: string | null = null;
-
   const handleMessage = (e: MessageEvent) => {
     const msg = JSON.parse(e.data) as WSMessage;
-
-    if (!waitingFor) return;
-    if (msg.event !== waitingFor) return;
 
     const value = msg.payload;
 
@@ -48,15 +43,12 @@ export const URLSearch = () => {
         setErrorMessage(err.message);
       }
     } finally {
-      waitingFor = null;
       setLoading(false);
     }
   };
 
   const onSubmit = () => {
     if (loading || socket.readyState !== WebSocket.OPEN) return;
-
-    waitingFor = `scrape.${recipeURL}`;
 
     socket.send(
       JSON.stringify({

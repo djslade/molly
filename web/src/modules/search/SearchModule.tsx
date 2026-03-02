@@ -46,7 +46,6 @@ export const SearchModule = () => {
       const response = await fetch(
         `${getServerURL()}/recipes?page=${params.get("p") || "1"}`,
       );
-      console.log(response);
       const data = await response.json();
       const res: SearchRecipesResponse = {
         total: data.total,

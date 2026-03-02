@@ -9,26 +9,37 @@ import (
 )
 
 type Publisher interface {
-	SendScraperRequest(ctx context.Context, request any) error
+	SendScraperRequest(ctx context.Context, recipeUrl string) error
+}
+
+type RecipeService interface {
+	GetRecipeWithUrl(ctx context.Context, url string) (string, error)
 }
 
 type Handler struct {
-	hub       *Hub
-	publisher Publisher
+	hub           *Hub
+	publisher     Publisher
+	recipeService RecipeService
+}
+
+type payload struct {
+	URL string `json:"url"`
 }
 
 type startMessage struct {
-	URL string `json:"url"`
+	Event   string  `json:"event"`
+	Payload payload `json:"payload"`
 }
 
 var upgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool { return true },
 }
 
-func NewHandler(hub *Hub, publisher Publisher) *Handler {
+func NewHandler(hub *Hub, publisher Publisher, recipeService RecipeService) *Handler {
 	return &Handler{
-		hub:       hub,
-		publisher: publisher,
+		hub:           hub,
+		publisher:     publisher,
+		recipeService: recipeService,
 	}
 }
 
@@ -45,13 +56,23 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if msg.URL == "" {
+	recipeUrl := msg.Payload.URL
+
+	if recipeUrl == "" {
 		conn.Close()
 		return
 	}
 
-	h.hub.Register(msg.URL, conn)
-	defer h.hub.Deregister(msg.URL, conn)
+	h.hub.Register(recipeUrl, conn)
+	defer h.hub.Remove(recipeUrl, conn)
+
+	recipeId, err := h.recipeService.GetRecipeWithUrl(r.Context(), recipeUrl)
+	if recipeId != "" {
+		h.hub.Send(msg.Payload.URL, recipeId)
+		return
+	}
+
+	h.publisher.SendScraperRequest(r.Context(), recipeUrl)
 
 	for {
 		if _, _, err := conn.ReadMessage(); err != nil {
