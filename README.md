@@ -23,10 +23,6 @@ I will update this section as more features are implemented.
 - Recipe collections
 - Shopping lists
 
-## Quick Start
-
-Click [here](https://molly.davidslade.dev/) to visit the live demo.
-
 ## Usage
 
 ### Import recipes
@@ -52,6 +48,5 @@ The scraper is built with Python and depends on the fantastic [Recipe Scrapers](
 ### Molly Server
 
 The user-friendly gateway of the whole application. Written in Typescript and utilizing the NestJS framework, the server supports RESTful HTTP calls and websocket connections from clients, whilst itself employing gRPC calls and RabbitMQ to communicate with the other services. It also caches successful calls to the Recipe service in-memory to bolster performance.
-
 
 Molly also supports a web client built on Vite, React, Tanstack Query and ShadCN.

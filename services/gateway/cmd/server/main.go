@@ -27,6 +27,7 @@ func main() {
 	defer recipesClient.Close()
 	log.Print("gRPC connection to recipes service established")
 
+	log.Print(os.Getenv("RMQ_CONN"))
 	rmqConn, err := pubsub.NewConnection(os.Getenv("RMQ_CONN"))
 	if err != nil {
 		log.Fatal(err)

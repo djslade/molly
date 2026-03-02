@@ -44,16 +44,14 @@ type server struct {
 func main() {
 	logger := log.New(os.Stdout, "", log.Ldate|log.Ltime)
 
-	if err := godotenv.Load(); err != nil {
-		logger.Printf("There was an issue loading env variables: %v\n", err)
-		os.Exit(1)
-	}
+	godotenv.Load()
 
 	port := os.Getenv("PORT")
 	if port == "" {
 		logger.Println("'PORT' is not defined")
 		os.Exit(1)
 	}
+
 	dbURL := os.Getenv("POSTGRES_CONNECTION_STRING")
 	if dbURL == "" {
 		logger.Println("'POSTGRES_CONNECTION_STRING' is not defined")
