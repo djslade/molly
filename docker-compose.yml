@@ -14,6 +14,12 @@ services:
   rmq:
     image: rabbitmq:3.13
     env_file: .env
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
   recipes:
     image: fenroe/molly-recipes:latest
     env_file: .env
@@ -27,14 +33,14 @@ services:
     pull_policy: always
     depends_on:
       rmq:
-        condition: service_started
+        condition: service_healthy
   gateway:
     image: fenroe/molly-gateway:latest
     env_file: .env
     pull_policy: always
     depends_on:
       rmq:
-        condition: service_started
+        condition: service_healthy
       recipes:
         condition: service_started
       scraper:

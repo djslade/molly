@@ -12,9 +12,11 @@ import (
 	"github.com/djslade/molly/internal/recipes"
 	"github.com/djslade/molly/internal/server"
 	"github.com/djslade/molly/internal/ws"
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	godotenv.Load()
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
@@ -27,7 +29,6 @@ func main() {
 	defer recipesClient.Close()
 	log.Print("gRPC connection to recipes service established")
 
-	log.Print(os.Getenv("RMQ_CONN"))
 	rmqConn, err := pubsub.NewConnection(os.Getenv("RMQ_CONN"))
 	if err != nil {
 		log.Fatal(err)
